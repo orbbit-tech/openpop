@@ -95,7 +95,7 @@ Step 3 — Underwriting
 **Done when:**
 ```bash
 cre workflow simulate --broadcast --target staging-settings
-# → receipt.json written: { compliant, score, approved, dairyPrice, txHash, signature }
+# → proof.json written: { compliant, score, approved, dairyPrice, txHash, signature }
 # → Arc testnet tx ID confirmed on explorer
 ```
 
@@ -151,22 +151,22 @@ apps/demo-ui/src/lib/
 
 ## 03 · Orchestration `[sequential — needs 02-A + 02-B + 02-C]`
 
-Backend-only. Connect the three sponsor tech layers, run the full pipeline once, write `receipt.json`. No UI involved.
+Backend-only. Connect the three sponsor tech layers, run the full pipeline once, write `proof.json`. No UI involved.
 
 ```
 scripts/
-└── run.ts    ← cre simulate --broadcast → receipt.json written
+└── run.ts    ← cre simulate --broadcast → proof.json written
               ← Dynamic server wallet calls submitProof(receipt)
               ← Arc contract releases USDC
-              ← receipt.json contains txHash + all step outputs
+              ← proof.json contains txHash + all step outputs
 ```
 
-**State store:** `receipt.json` flat file — written once by this script, read by everything else. No database.
+**State store:** `proof.json` flat file — written once by this script, read by everything else. No database.
 
 **Done when:**
 ```bash
 pnpm run pipeline
-# → receipt.json written with real signature + txHash
+# → proof.json written with real signature + txHash
 # → Arc contract status → "funded"
 # → USDC in Sneehee's wallet
 ```
@@ -175,9 +175,9 @@ pnpm run pipeline
 
 ## 04 · Integration `[sequential — wires 01 UI shell to 03 live data]`
 
-UI-only. Swap every hardcoded fixture in the shell components for live reads from `receipt.json`. This is where the demo becomes live.
+UI-only. Swap every hardcoded fixture in the shell components for live reads from `proof.json`. This is where the demo becomes live.
 
-- `PipelineSteps` reads step timestamps from `receipt.json` via `/api/receipt`
+- `PipelineSteps` reads step timestamps from `proof.json` via `/api/receipt`
 - `ReceiptCard` renders real CRE receipt + real Arc tx link
 - `AgentVerdict` calls `/api/mcp` (get_proof) and displays real verdict
 - `/invest` page shows real escrow balance read live from Arc contract
@@ -193,7 +193,7 @@ Everything that must be live for judges to interact.
 | What | Where | How |
 |---|---|---|
 | `ProofGatedEscrow.sol` | Arc testnet | already deployed in `02-B` |
-| `cre simulate --broadcast` | Local (pre-run) | run once, commit `receipt.json` |
+| `cre simulate --broadcast` | Local (pre-run) | run once, commit `proof.json` |
 | `demo-ui` + API routes + MCP server | Vercel | `vercel --prod` |
 | Dairy cream price API | AWS Lambda (already live) | no change needed |
 
@@ -201,7 +201,7 @@ Everything that must be live for judges to interact.
 ```
 /              → OpenPop studio (pipeline + receipt + agent verdict)
 /invest        → Investor panel (deposit status + receipt + Arc tx link)
-/api/receipt   → returns receipt.json
+/api/receipt   → returns proof.json
 /api/mcp       → get_proof MCP endpoint
 ```
 
@@ -242,6 +242,6 @@ const result = confClient.sendRequest(runtime, (req) => {
 }, aggregation).result()
 ```
 
-Re-run `cre simulate --broadcast` → new `receipt.json` → commit → redeploy. Nothing else changes.
+Re-run `cre simulate --broadcast` → new `proof.json` → commit → redeploy. Nothing else changes.
 
-**Done when:** receipt.json contains real LLM attestation metadata; UI labels Step 3 as "Confidential AI Attester".
+**Done when:** proof.json contains real LLM attestation metadata; UI labels Step 3 as "Confidential AI Attester".
