@@ -23,8 +23,8 @@ flowchart TD
         H1_WAIT["Human states intent"]
         NECESSITY["💬 First Principles · Necessity: does this need to be built? already exists? simpler alternative?"]
         H_COMMIT["🛑 WAIT — human confirms: yes, build this"]
-        LINEAR["Create Linear issue via /linear-issue (all required fields: priority, assignee, labels, project, milestone ID, estimate, due date, cycle) → verify response → get TECH-N"]
-        WORKTREE["pnpm worktree tech-n-slug · runs scripts/new-worktree.sh which creates the branch AND symlinks all .env.local files · directory name uppercase TECH-N, branch name lowercase tech-n"]
+        LINEAR["Create Linear issue via /linear-issue (all required fields: priority, assignee, labels, project, milestone, estimate, due date) → verify response → get TECH-N"]
+        WORKTREE["git worktree add /Users/aphanmiz/Desktop/Orbbit/orbbit-codebase/hackathons/openpop-worktrees/TECH-N-slug -b tech-n-slug · directory name uppercase TECH-N, branch name lowercase tech-n"]
         GRILL["💬 First Principles · How: approach · constraints · verify criteria"]
         PRCHECK{"PR reviewable in ≤10 min?"}
         SPLIT["Split scope → grill each part"]
@@ -163,11 +163,11 @@ Examples:
 
 **Read all referenced skills before Phase 1 begins**
 - **What:** Before executing any Phase 1 step, read the full SKILL.md for every skill referenced in this sprint: `/linear-issue`, `/git`. Do not rely on memory or prior context — read the files.
-- **Why:** Skills are the source of truth for their own contracts. Skipping a read means operating from a stale or incomplete mental model — missing required fields, wrong paths, wrong conventions. This is exactly how errors like missing `milestone`, wrong worktree paths, or wrong branch casing happen.
+- **Why:** Skills are the source of truth for their own contracts. Skipping a read means operating from a stale or incomplete mental model — wrong paths, wrong conventions. This is exactly how errors like wrong worktree paths or wrong branch casing happen.
 - **How:** At sprint start, read these files in order before any other action:
-  1. `.claude/skills/linear-issue/SKILL.md`
-  2. `.claude/skills/git/references/branch.md`
-  3. `.claude/skills/git/references/commit.md`
+  1. `/Users/aphanmiz/Desktop/Orbbit/orbbit-codebase/hackathons/openpop/.claude/skills/linear-issue/SKILL.md`
+  2. `/Users/aphanmiz/Desktop/Orbbit/orbbit-codebase/hackathons/openpop/.claude/skills/git/references/branch.md`
+  3. `/Users/aphanmiz/Desktop/Orbbit/orbbit-codebase/hackathons/openpop/.claude/skills/git/references/commit.md`
   Then proceed with the SOP. Never skip this step, even if the sprint is a continuation.
 
 ---
@@ -205,7 +205,7 @@ Examples:
 - **Why:** An agent that silently operates on the wrong branch corrupts another sprint's work. Two Phase 2 agents both in `/orbbit/` share the same `HEAD` and conflict immediately.
 - **How:**
   - Phase 1 entry: assert `git branch --show-current` = `main` in the main session. Halt and instruct the user to `git checkout main` if not.
-  - Phase 2 entry: build agent's first action is `cd` into `/Users/aphanmiz/Desktop/Orbbit/orbbit-codebase/orbbit-worktrees/TECH-N-slug/`, then assert `git branch --show-current` = `tech-n-slug`. Halt if either check fails. No file writes or git commands before this check passes.
+  - Phase 2 entry: build agent's first action is `cd` into `/Users/aphanmiz/Desktop/Orbbit/orbbit-codebase/hackathons/openpop-worktrees/TECH-N-slug/`, then assert `git branch --show-current` = `tech-n-slug`. Halt if either check fails. No file writes or git commands before this check passes.
   - Phase 3 after cleanup: main session asserts `git branch --show-current` = `main` and runs `git pull` to receive the merged commits. If the worktree directory still exists, run `git worktree remove` before proceeding.
 
 **Phase Gates**
@@ -216,7 +216,7 @@ Examples:
 **Phase 1 runs on main — no files until the worktree exists**
 - **What:** Main must be clean and in sync with remote before any Phase 1 work begins.
 - **Why:** Worktree branches from wherever local main points — dirty or stale main means the sprint starts from bad state, discovered only at merge time.
-- **How:** On invocation: verify branch is main → verify working tree is clean → fetch and sync with remote → then proceed. Confirm necessity → invoke `/linear-issue` (all required fields) → run `pnpm worktree tech-n-slug` from the repo root (this calls `scripts/new-worktree.sh` which creates the branch AND symlinks all `.env.local` files into the worktree automatically — never use bare `git worktree add`) → grill topic 2 → write spec.md into the worktree → print path → wait for approval. Main session never leaves main.
+- **How:** On invocation: verify branch is main → verify working tree is clean → fetch and sync with remote → then proceed. Confirm necessity → run `git worktree add /Users/aphanmiz/Desktop/Orbbit/orbbit-codebase/hackathons/openpop-worktrees/TECH-N-slug -b tech-n-slug` from the repo root → grill topic 2 → write spec.md into the worktree → print path → wait for approval. Main session never leaves main.
 
 **Spec, test plan, and code are colocated in the worktree**
 - **What:** Every artifact produced in a sprint — spec, test plan, tests, and implementation — lives on the feature branch in the worktree. Nothing is committed to main during the sprint.
@@ -226,7 +226,7 @@ Examples:
 **Work In Progress (WIP) Limit**
 - **What:** One issue per worktree per branch; worktrees may run in parallel.
 - **Why:** Isolating one issue per worktree keeps each diff unambiguous — it maps to exactly one spec. Parallel worktrees are safe as long as file footprints do not overlap; overlapping footprints are a scoping failure, not a merge problem.
-- **How:** Create the worktree at the end of Phase 1 with `pnpm worktree tech-n-slug` from the repo root. The build agent works inside the worktree directory for all of Phase 2 and Phase 3. After the PR merges, run `git worktree remove` — the main session was on main the whole time, nothing to switch back to. One issue = one branch = one worktree — created together, destroyed after merge.
+- **How:** Create the worktree at the end of Phase 1 with `git worktree add /Users/aphanmiz/Desktop/Orbbit/orbbit-codebase/hackathons/openpop-worktrees/TECH-N-slug -b tech-n-slug` from the repo root. The build agent works inside the worktree directory for all of Phase 2 and Phase 3. After the PR merges, run `git worktree remove` — the main session was on main the whole time, nothing to switch back to. One issue = one branch = one worktree — created together, destroyed after merge.
 
 **Review Gates**
 - **What:** At every 🛑 gate that produces a file (spec, test plan, diff), write the file first, then print only the absolute path. Never print file contents in the terminal.

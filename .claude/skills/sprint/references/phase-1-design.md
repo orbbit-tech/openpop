@@ -85,7 +85,7 @@ Update the spec draft with the pruned Action Items list before moving to approva
 - `Spec: specs/...` line pointing to the file
 - `Blocked by: [issue]` if applicable
 
-Show the created issue ID, then create the branch following `references/branch.md` in the `git` skill.
+Show the created issue ID, then run `git worktree add /Users/aphanmiz/Desktop/Orbbit/orbbit-codebase/hackathons/openpop-worktrees/TECH-N-slug -b tech-n-slug` from `/Users/aphanmiz/Desktop/Orbbit/orbbit-codebase/hackathons/openpop/`.
 
 ---
 
