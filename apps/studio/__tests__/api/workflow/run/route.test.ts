@@ -2,12 +2,12 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { NextRequest } from 'next/server'
 import { spawnSync } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
-import type { Receipt } from '../../../../../types/receipt'
+import type { Receipt } from '../../../../src/types/receipt'
 
 vi.mock('node:child_process')
 vi.mock('node:fs')
 
-const { POST } = await import('../route')
+const { POST } = await import('../../../../src/app/api/workflow/run/route')
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
 
