@@ -15,14 +15,15 @@ async function main() {
   if (!recipientAddress) throw new Error('RECIPIENT_ADDRESS not set')
   if (!usdcAddress) throw new Error('USDC_ADDRESS not set')
 
-  const [signer] = await hre.ethers.getSigners()
+  const conn = await hre.network.connect()
+  const [signer] = await conn.ethers.getSigners()
 
-  const usdc = new hre.ethers.Contract(usdcAddress, ERC20_ABI, signer)
+  const usdc = new conn.ethers.Contract(usdcAddress, ERC20_ABI, signer)
   const balance = await usdc.balanceOf(signer.address)
   console.log(`USDC balance: ${balance}`)
   if (balance < DEPOSIT_AMOUNT) throw new Error(`Insufficient USDC — need ${DEPOSIT_AMOUNT}, have ${balance}. Get more from the Arc faucet.`)
 
-  const escrow = await hre.ethers.getContractAt('ProofGatedEscrow', escrowAddress)
+  const escrow = await conn.ethers.getContractAt('ProofGatedEscrow', escrowAddress, signer)
 
   const tx1 = await escrow.createDeal(recipientAddress)
   await tx1.wait()
