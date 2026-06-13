@@ -20,7 +20,7 @@ async function main(): Promise<void> {
   const chainId = Number(process.env.ARC_CHAIN_ID);
   const rpcUrl = process.env.ARC_RPC_URL!;
   const dairyApiUrl = process.env.DAIRY_API_URL!;
-  const escrowAddress = process.env.PROOF_ESCROW_ADDRESS! as `0x${string}`;
+  const escrowAddress = process.env.PROOF_GATED_ESCROW_ADDRESS! as `0x${string}`;
 
   const walletClient = await getViemWalletClient(chainId, rpcUrl);
   const walletAddress = walletClient.account!.address;

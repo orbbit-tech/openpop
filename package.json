@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "start": "tsx --env-file=.env scripts/run.ts",
+    "start": "tsx --env-file=.env.local scripts/run.ts",
+    "setup": "ln -sf ../../.env.local apps/demo-ui/.env.local && echo 'Symlinked .env.local into apps/demo-ui'",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

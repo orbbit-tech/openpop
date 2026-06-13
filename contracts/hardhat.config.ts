@@ -1,12 +1,44 @@
-import "@nomicfoundation/hardhat-foundry";
-import { HardhatUserConfig } from "hardhat/config";
+import { defineConfig, configVariable } from "hardhat/config";
+import hardhatFoundry from "@nomicfoundation/hardhat-foundry";
+import hardhatEthers from "@nomicfoundation/hardhat-ethers";
+import hardhatKeystore from "@nomicfoundation/hardhat-keystore";
+import hardhatVerify from "@nomicfoundation/hardhat-verify";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const config: HardhatUserConfig = {
-  solidity: "0.8.24",
+// Load shared env from repo root — all sub-projects (contracts, apps) read .env.local
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
+
+// DEPLOYER_PRIVATE_KEY is stored encrypted in the Hardhat keystore — never in .env.local.
+// Set it once with: npx hardhat keystore set DEPLOYER_PRIVATE_KEY
+export default defineConfig({
+  plugins: [hardhatFoundry, hardhatEthers, hardhatKeystore, hardhatVerify],
+  solidity: { version: "0.8.24", settings: { evmVersion: "cancun" } },
   paths: {
-    sources: "contracts",
+    sources: "src",
     cache: "cache_hardhat",
   },
-};
-
-export default config;
+  networks: {
+    "arc-testnet": {
+      type: "http",
+      url: process.env.ARC_RPC_URL ?? "https://rpc.testnet.arc.network",
+      chainId: 5042002,
+      accounts: [configVariable("DEPLOYER_PRIVATE_KEY")],
+    },
+  },
+  etherscan: {
+    apiKey: { "arc-testnet": "placeholder" },
+    customChains: [
+      {
+        network: "arc-testnet",
+        chainId: 5042002,
+        urls: {
+          apiURL: "https://testnet.arcscan.app/api",
+          browserURL: "https://testnet.arcscan.app",
+        },
+      },
+    ],
+  },
+});

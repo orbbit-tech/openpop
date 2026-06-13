@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {Test} from "forge-std/Test.sol";
-import {ProofGatedEscrow} from "../../contracts/ProofGatedEscrow.sol";
+import {ProofGatedEscrow} from "../../src/ProofGatedEscrow.sol";
 import {MockERC20, MockForwarder} from "../helpers/ProofGatedEscrowMocks.sol";
 
 // ── Base ──────────────────────────────────────────────────────────────────────
@@ -70,54 +70,54 @@ contract ProofGatedEscrow_deposit is ProofGatedEscrowTest {
     }
 }
 
-// ── submitProof ───────────────────────────────────────────────────────────────
+// ── onReport ─────────────────────────────────────────────────────────────────
 
-contract ProofGatedEscrow_submitProof is ProofGatedEscrowTest {
+contract ProofGatedEscrow_onReport is ProofGatedEscrowTest {
     function setUp() public override {
         super.setUp();
         vm.prank(investor);
         escrow.deposit(DEAL_ID, AMOUNT);
     }
 
-    // [happy-path] valid signature, approved verdict — USDC released to recipient
+    // [happy-path] authorized forwarder + approved=true → USDC released to recipient, Released event emitted
     function test_releasesUsdcToRecipientAndEmitsReleased() public {
         vm.expectEmit(true, true, false, true);
         emit ProofGatedEscrow.Released(DEAL_ID, recipient, AMOUNT);
-        escrow.submitProof(DEAL_ID, true, "");
+        vm.prank(address(forwarder));
+        escrow.onReport("", abi.encode(DEAL_ID, true));
         assertEq(usdc.balanceOf(recipient), AMOUNT);
     }
 
-    // [unhappy-path] rejected verdict — funds stay locked and Rejected event emitted
-    function test_emitsRejectedOnRejectedVerdict() public {
+    // [happy-path] authorized forwarder + approved=false → deal marked REJECTED, Rejected event emitted
+    function test_emitsRejectedAndMarksRejected() public {
         vm.expectEmit(true, false, false, false);
         emit ProofGatedEscrow.Rejected(DEAL_ID);
-        escrow.submitProof(DEAL_ID, false, "");
+        vm.prank(address(forwarder));
+        escrow.onReport("", abi.encode(DEAL_ID, false));
+        (,, ProofGatedEscrow.State state) = escrow.deals(DEAL_ID);
+        assertEq(uint256(state), uint256(ProofGatedEscrow.State.REJECTED));
     }
 
-    // [unhappy-path] forwarder rejects the signature — reverts before any state change
-    function test_revertsIfForwarderRejectsSignature() public {
-        MockForwarder badForwarder = new MockForwarder(false);
-        ProofGatedEscrow badEscrow = new ProofGatedEscrow(address(usdc), address(badForwarder));
-        badEscrow.createDeal(recipient);
-        usdc.mint(investor, AMOUNT);
-        vm.startPrank(investor);
-        usdc.approve(address(badEscrow), AMOUNT);
-        badEscrow.deposit(1, AMOUNT);
-        vm.stopPrank();
-        vm.expectRevert();
-        badEscrow.submitProof(1, true, "");
-    }
-
-    // [unhappy-path] submitProof before any deposit reverts
-    function test_revertsIfNoDepositMade() public {
-        escrow.createDeal(recipient);
-        vm.expectRevert();
-        escrow.submitProof(2, true, "");
-    }
-
-    // [invariant] contract USDC balance is exactly zero after a successful release
+    // [invariant] contract USDC balance is exactly zero after release
     function test_contractBalanceIsZeroAfterRelease() public {
-        escrow.submitProof(DEAL_ID, true, "");
+        vm.prank(address(forwarder));
+        escrow.onReport("", abi.encode(DEAL_ID, true));
         assertEq(usdc.balanceOf(address(escrow)), 0);
+    }
+
+    // [unhappy-path] unauthorized caller (not forwarder) → reverts
+    function test_revertsIfCallerIsNotForwarder() public {
+        address attacker = makeAddr("attacker");
+        vm.prank(attacker);
+        vm.expectRevert();
+        escrow.onReport("", abi.encode(DEAL_ID, true));
+    }
+
+    // [unhappy-path] deal state is not FUNDED → reverts
+    function test_revertsIfDealNotFunded() public {
+        uint256 newDealId = escrow.createDeal(recipient);
+        vm.prank(address(forwarder));
+        vm.expectRevert();
+        escrow.onReport("", abi.encode(newDealId, true));
     }
 }
