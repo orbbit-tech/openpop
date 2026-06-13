@@ -15,7 +15,7 @@ async function main() {
   if (!recipientAddress) throw new Error('RECIPIENT_ADDRESS not set')
   if (!usdcAddress) throw new Error('USDC_ADDRESS not set')
 
-  const conn = await hre.network.connect()
+  const conn = await hre.network.getOrCreate()
   const [signer] = await conn.ethers.getSigners()
 
   const usdc = new conn.ethers.Contract(usdcAddress, ERC20_ABI, signer)

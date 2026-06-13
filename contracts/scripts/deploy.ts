@@ -6,7 +6,7 @@ async function main() {
   const usdcAddress = process.env.USDC_ADDRESS
   if (!usdcAddress) throw new Error('USDC_ADDRESS not set')
 
-  const conn = await hre.network.connect()
+  const conn = await hre.network.getOrCreate()
   const [deployer] = await conn.ethers.getSigners()
   console.log('Deploying from:', deployer.address)
 
