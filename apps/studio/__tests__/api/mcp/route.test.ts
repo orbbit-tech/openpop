@@ -1,11 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { NextRequest } from 'next/server'
 import { readFile } from 'fs/promises'
-import type { Receipt } from '../../../../types/receipt'
+import type { Receipt } from '../../../src/types/receipt'
 
 vi.mock('fs/promises')
 
-const { POST } = await import('../route')
+const { POST } = await import('../../../src/app/api/mcp/route')
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
 
