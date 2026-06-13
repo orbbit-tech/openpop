@@ -10,3 +10,4 @@ contracts/cache_hardhat/
 contracts/out/
 .env.local
 .env
+memory/
