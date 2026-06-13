@@ -186,7 +186,8 @@
     box-sizing: border-box;
   }
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(220, 14%, 96%);
+    @apply text-foreground;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
     min-height: 100vh;
