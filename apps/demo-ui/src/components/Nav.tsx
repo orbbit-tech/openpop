@@ -22,38 +22,9 @@ export function Nav({ onOpen }: NavProps) {
     >
       {/* Left: logo + proof ID */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <a
-          href="#"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            fontSize: 14,
-            fontWeight: 600,
-            letterSpacing: '-0.02em',
-            color: 'var(--text-1)',
-            textDecoration: 'none',
-          }}
-        >
-          {/* Logo mark */}
-          <div
-            style={{
-              width: 22,
-              height: 22,
-              background: 'var(--teal)',
-              borderRadius: 4,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-            }}
-          >
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor">
-              <circle cx="8" cy="8" r="3" />
-              <circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" strokeWidth="1.5" />
-            </svg>
-          </div>
-          OpenPop
+        <a href="#" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/openpop-logo.svg" alt="OpenPop" style={{ height: 28, width: 'auto' }} />
         </a>
 
         <span
