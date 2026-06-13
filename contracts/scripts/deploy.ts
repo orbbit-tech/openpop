@@ -6,10 +6,11 @@ async function main() {
   const usdcAddress = process.env.USDC_ADDRESS
   if (!usdcAddress) throw new Error('USDC_ADDRESS not set')
 
-  const [deployer] = await hre.ethers.getSigners()
+  const conn = await hre.network.connect()
+  const [deployer] = await conn.ethers.getSigners()
   console.log('Deploying from:', deployer.address)
 
-  const Escrow = await hre.ethers.getContractFactory('ProofGatedEscrow')
+  const Escrow = await conn.ethers.getContractFactory('ProofGatedEscrow')
   const escrow = await Escrow.deploy(usdcAddress, MOCK_KEYSTONE_FORWARDER)
   await escrow.waitForDeployment()
 
