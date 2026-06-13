@@ -144,12 +144,9 @@ contract ProofGatedEscrow is ReceiverTemplate {
      *         or marks the deal as rejected.
      * @dev    Called exclusively by the Keystone Forwarder (enforced via onlyForwarder).
      *         The report bytes are ABI-decoded as (uint256 dealId, bool approved).
-     *         metadata is unused in this implementation.
-     *
-     * @param metadata Unused Keystone metadata header.
-     * @param report   ABI-encoded (uint256 dealId, bool approved) verdict from the CRE workflow.
+     * @param report ABI-encoded (uint256 dealId, bool approved) verdict from the CRE workflow.
      */
-    function onReport(bytes calldata metadata, bytes calldata report) external override onlyForwarder {
+    function onReport(bytes calldata /* metadata */, bytes calldata report) external override onlyForwarder {
         (uint256 dealId, bool approved) = abi.decode(report, (uint256, bool));
         Deal storage deal = deals[dealId];
         require(deal.state == State.FUNDED, "ProofGatedEscrow: funds not locked");
