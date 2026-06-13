@@ -17,7 +17,7 @@ Read the relevant reference file before answering. Do not rely on memory.
 | Deploy from bytecode | `references/use-scp-deploy-bytecode.md` |
 | ABI-based contract calls (submitProof, releaseToRecipient) | `references/use-scp-interact.md` |
 | Monitor contract events via webhook | `references/use-scp-monitor-events.md` |
-| Bridge USDC cross-chain (Aaron's any-chain deposit via CCTP) | `references/bridge-stablecoin.md` |
+| Bridge USDC cross-chain (investor's any-chain deposit via CCTP) | `references/bridge-stablecoin.md` |
 | Bridge with private key adapter (Dynamic server wallet pattern) | `references/bridge-adapter-private-key.md` |
 | x402 pay-per-call flow (dairy price API payment) | `references/pay-via-agent-wallet.md` |
 | Circle Gateway — cross-chain USDC routing | `references/use-gateway.md` |
