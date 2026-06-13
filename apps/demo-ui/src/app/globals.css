@@ -1,0 +1,210 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 2px);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+:root {
+  /* Base — Orbbit teal palette */
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(215, 20%, 17%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(215, 20%, 17%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(215, 20%, 17%);
+
+  /* Primary teal */
+  --primary: hsl(180, 85%, 32%);
+  --primary-foreground: hsl(0, 0%, 100%);
+
+  /* Secondary */
+  --secondary: hsl(214, 32%, 91%);
+  --secondary-foreground: hsl(215, 20%, 17%);
+
+  /* Semantic */
+  --success: hsl(142, 71%, 45%);
+  --success-foreground: hsl(0, 0%, 100%);
+  --warning: hsl(38, 92%, 50%);
+  --warning-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(0, 72%, 51%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+
+  /* UI state */
+  --muted: hsl(220, 14%, 99%);
+  --muted-foreground: hsl(215, 16%, 47%);
+  --accent: hsl(220, 14%, 96%);
+  --accent-foreground: hsl(215, 20%, 17%);
+
+  /* Borders */
+  --border: hsl(214, 32%, 91%);
+  --input: hsl(214, 32%, 91%);
+  --ring: hsl(180, 85%, 32%);
+
+  /* Layout */
+  --radius: 0.5rem;
+
+  /* Charts */
+  --chart-1: hsl(180, 85%, 32%);
+  --chart-2: hsl(217, 91%, 60%);
+  --chart-3: hsl(142, 71%, 45%);
+  --chart-4: hsl(215, 16%, 47%);
+  --chart-5: hsl(38, 92%, 50%);
+
+  /* Sidebar */
+  --sidebar: hsl(0, 0%, 98%);
+  --sidebar-foreground: hsl(215, 19%, 35%);
+  --sidebar-primary: hsl(240, 5.9%, 10%);
+  --sidebar-primary-foreground: hsl(0, 0%, 98%);
+  --sidebar-accent: hsl(220, 14%, 96%);
+  --sidebar-accent-foreground: hsl(240, 5.9%, 10%);
+  --sidebar-border: hsl(220, 13%, 91%);
+  --sidebar-ring: hsl(217.2, 91.2%, 59.8%);
+
+  /* PoC legacy tokens used in inline styles */
+  --surface: hsl(0, 0%, 100%);
+  --border-soft: hsl(214, 32%, 91%);
+  --text-1: hsl(215, 25%, 13%);
+  --text-2: hsl(215, 16%, 42%);
+  --text-3: hsl(215, 14%, 62%);
+  --teal: hsl(180, 85%, 32%);
+  --accent-bg: hsl(220, 14%, 98%);
+}
+
+.dark {
+  /* Base */
+  --background: hsl(222, 47%, 11%);
+  --foreground: hsl(210, 40%, 98%);
+  --card: hsl(217, 33%, 17%);
+  --card-foreground: hsl(210, 40%, 98%);
+  --popover: hsl(217, 33%, 17%);
+  --popover-foreground: hsl(210, 40%, 98%);
+
+  /* Primary teal (brighter in dark) */
+  --primary: hsl(180, 85%, 47%);
+  --primary-foreground: hsl(222, 47%, 11%);
+
+  /* Secondary */
+  --secondary: hsl(215, 25%, 27%);
+  --secondary-foreground: hsl(210, 40%, 98%);
+
+  /* Semantic */
+  --success: hsl(142, 71%, 45%);
+  --success-foreground: hsl(222, 47%, 11%);
+  --warning: hsl(38, 92%, 50%);
+  --warning-foreground: hsl(222, 47%, 11%);
+  --destructive: hsl(0, 72%, 51%);
+  --destructive-foreground: hsl(210, 40%, 98%);
+
+  /* UI state */
+  --muted: hsl(220, 14%, 14%);
+  --muted-foreground: hsl(215, 20%, 65%);
+  --accent: hsl(220, 14%, 18%);
+  --accent-foreground: hsl(210, 40%, 98%);
+
+  /* Borders */
+  --border: hsl(215, 25%, 27%);
+  --input: hsl(215, 25%, 27%);
+  --ring: hsl(180, 85%, 47%);
+
+  /* Charts */
+  --chart-1: hsl(180, 85%, 47%);
+  --chart-2: hsl(217, 91%, 60%);
+  --chart-3: hsl(142, 71%, 45%);
+  --chart-4: hsl(215, 20%, 65%);
+  --chart-5: hsl(38, 92%, 50%);
+
+  /* Sidebar */
+  --sidebar: hsl(240, 5.9%, 10%);
+  --sidebar-foreground: hsl(240, 4.8%, 95.9%);
+  --sidebar-primary: hsl(224.3, 76.3%, 48%);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(220, 14%, 18%);
+  --sidebar-accent-foreground: hsl(240, 4.8%, 95.9%);
+  --sidebar-border: hsl(240, 3.7%, 15.9%);
+  --sidebar-ring: hsl(217.2, 91.2%, 59.8%);
+
+  /* PoC legacy tokens */
+  --surface: hsl(217, 33%, 17%);
+  --border-soft: hsl(215, 25%, 27%);
+  --text-1: hsl(210, 40%, 98%);
+  --text-2: hsl(215, 20%, 65%);
+  --text-3: hsl(215, 16%, 47%);
+  --teal: hsl(180, 85%, 47%);
+  --accent-bg: hsl(220, 14%, 18%);
+}
+
+@layer base {
+  html {
+    scrollbar-gutter: stable;
+    font-size: 14px;
+    scroll-behavior: smooth;
+  }
+  * {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+  body {
+    background-color: hsl(220, 14%, 96%);
+    @apply text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Thin scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(0, 0%, 83%) hsl(0, 0%, 90%);
+  }
+  *::-webkit-scrollbar { width: 6px; height: 6px; }
+  *::-webkit-scrollbar-track { background: hsl(0, 0%, 90%); border-radius: 4px; }
+  *::-webkit-scrollbar-thumb { background: hsl(0, 0%, 83%); border-radius: 4px; }
+  *::-webkit-scrollbar-thumb:hover { background: hsl(0, 0%, 71%); }
+
+  /* React Flow overrides */
+  .react-flow__node { cursor: default !important; }
+  .react-flow__pane { cursor: grab !important; }
+}
