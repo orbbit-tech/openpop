@@ -21,7 +21,7 @@ export function WorkflowCanvas({ receipt }: Props) {
         position: { x: 0, y: 0 },
         data: {
           label: 'Invoice Submitted',
-          meta: 'Gallivant Ice Cream · $50,000 · Walmart Net-30',
+          meta: `${receipt.companyName} · ${receipt.invoiceAmount}`,
           badge: 'Trigger',
           status: 'completed',
         },

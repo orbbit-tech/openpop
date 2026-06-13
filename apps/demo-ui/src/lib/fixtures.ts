@@ -1,6 +1,8 @@
 import type { Receipt } from '@/types/receipt'
 
 export const MOCK_RECEIPT: Receipt = {
+  companyName: 'Gallivant Ice Cream',
+  invoiceAmount: '$50,000 · Walmart Net-30',
   compliant: true,
   score: 82,
   approved: true,
