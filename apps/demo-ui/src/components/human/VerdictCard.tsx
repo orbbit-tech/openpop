@@ -39,7 +39,7 @@ export function VerdictCard({ receipt }: Props) {
             whiteSpace: 'nowrap' as const,
           }}
         >
-          Gallivant Ice Cream — Invoice {receipt.approved ? 'Approved' : 'Rejected'}
+          {receipt.companyName} — Invoice {receipt.approved ? 'Approved' : 'Rejected'}
         </span>
         <span
           style={{

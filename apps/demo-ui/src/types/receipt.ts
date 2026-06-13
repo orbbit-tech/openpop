@@ -1,4 +1,6 @@
 export type Receipt = {
+  companyName: string
+  invoiceAmount: string
   compliant: boolean
   score: number
   approved: boolean
