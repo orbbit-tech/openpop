@@ -1,5 +1,9 @@
 {
   "mcpServers": {
+    "linear-server": {
+      "type": "http",
+      "url": "https://mcp.linear.app/mcp"
+    },
     "playwright-mcp": {
       "_note": "stdio — spawns per session (~36 MB each). Generally prefer chrome MCP (claude-in-chrome) instead.",
       "type": "stdio",
