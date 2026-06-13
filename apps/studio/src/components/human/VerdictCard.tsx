@@ -1,10 +1,10 @@
-import type { Receipt } from '@/types/receipt'
+import type { Proof } from '@/types/proof'
 
 interface Props {
-  receipt: Receipt
+  proof: Proof
 }
 
-export function VerdictCard({ receipt }: Props) {
+export function VerdictCard({ proof }: Props) {
   return (
     <div
       style={{
@@ -26,7 +26,7 @@ export function VerdictCard({ receipt }: Props) {
             width: 7,
             height: 7,
             borderRadius: '50%',
-            background: receipt.approved ? 'var(--teal)' : 'hsl(0, 72%, 51%)',
+            background: proof.approved ? 'var(--teal)' : 'hsl(0, 72%, 51%)',
             flexShrink: 0,
           }}
         />
@@ -39,7 +39,7 @@ export function VerdictCard({ receipt }: Props) {
             whiteSpace: 'nowrap' as const,
           }}
         >
-          {receipt.companyName} — Invoice {receipt.approved ? 'Approved' : 'Rejected'}
+          {proof.companyName} — Invoice {proof.approved ? 'Approved' : 'Rejected'}
         </span>
         <span
           style={{
@@ -48,15 +48,15 @@ export function VerdictCard({ receipt }: Props) {
             whiteSpace: 'nowrap' as const,
           }}
         >
-          InvoiceFactoring · {receipt.timestamp.slice(0, 10)} · {receipt.timestamp.slice(11, 16)} UTC
+          InvoiceFactoring · {proof.timestamp.slice(0, 10)} · {proof.timestamp.slice(11, 16)} UTC
         </span>
       </div>
 
       {/* Right: pills */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-        <Pill label="Decision" value={receipt.approved ? 'Approved' : 'Rejected'} />
-        <Pill label="Score" value={`${receipt.score}/100`} />
-        <Pill label="Confidence" value={`${receipt.confidence}%`} />
+        <Pill label="Decision" value={proof.approved ? 'Approved' : 'Rejected'} />
+        <Pill label="Score" value={`${proof.score}/100`} />
+        <Pill label="Confidence" value={`${proof.confidence}%`} />
       </div>
     </div>
   )

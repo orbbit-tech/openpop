@@ -1,6 +1,6 @@
-import type { Receipt } from '@/types/receipt'
+import type { Proof } from '@/types/proof'
 
-export const MOCK_RECEIPT: Receipt = {
+export const MOCK_PROOF: Proof = {
   companyName: 'Gallivant Ice Cream',
   invoiceAmount: '$50,000 · Walmart Net-30',
   compliant: true,

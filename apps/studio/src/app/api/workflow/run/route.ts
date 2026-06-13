@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { spawnSync } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
 import path from 'node:path'
-import type { Receipt } from '../../../../types/receipt'
+import type { Proof } from '../../../../types/proof'
 
 type CREResult = {
   invoiceId: string
@@ -50,7 +50,7 @@ export async function POST(_request?: NextRequest): Promise<NextResponse> {
     )
   }
 
-  const receipt: Receipt = {
+  const proof: Proof = {
     companyName: cre.businessName,
     invoiceAmount: '$50,000 · Walmart Net-30',
     compliant:
@@ -88,7 +88,7 @@ export async function POST(_request?: NextRequest): Promise<NextResponse> {
     ],
   }
 
-  writeFileSync(path.join(process.cwd(), 'proof.json'), JSON.stringify(receipt, null, 2))
+  writeFileSync(path.join(process.cwd(), 'proof.json'), JSON.stringify(proof, null, 2))
 
-  return NextResponse.json({ receipt })
+  return NextResponse.json(proof)
 }

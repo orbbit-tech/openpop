@@ -4,15 +4,15 @@ import { useMemo } from 'react'
 import { ReactFlow, Controls, type Node, type Edge, type NodeTypes } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { ProofNode } from './ProofNode'
-import type { Receipt } from '@/types/receipt'
+import type { Proof } from '@/types/proof'
 
 const nodeTypes: NodeTypes = { proofNode: ProofNode }
 
 interface Props {
-  receipt: Receipt
+  proof: Proof
 }
 
-export function WorkflowCanvas({ receipt }: Props) {
+export function WorkflowCanvas({ proof }: Props) {
   const nodes: Node[] = useMemo(() => {
     const baseNodes: Node[] = [
       {
@@ -21,14 +21,14 @@ export function WorkflowCanvas({ receipt }: Props) {
         position: { x: 0, y: 0 },
         data: {
           label: 'Invoice Submitted',
-          meta: `${receipt.companyName} · ${receipt.invoiceAmount}`,
+          meta: `${proof.companyName} · ${proof.invoiceAmount}`,
           badge: 'Trigger',
           status: 'completed',
         },
       },
     ]
 
-    const stepNodes: Node[] = receipt.steps.map((step, i) => ({
+    const stepNodes: Node[] = proof.steps.map((step, i) => ({
       id: `step-${i}`,
       type: 'proofNode',
       position: { x: 0, y: 110 * (i + 1) },
@@ -43,20 +43,20 @@ export function WorkflowCanvas({ receipt }: Props) {
     const decisionNode: Node = {
       id: 'decision',
       type: 'proofNode',
-      position: { x: 0, y: 110 * (receipt.steps.length + 1) },
+      position: { x: 0, y: 110 * (proof.steps.length + 1) },
       data: {
         label: 'Decision Recorded',
-        meta: `Arc Testnet · Block ${receipt.blockNumber.toLocaleString()} · ${receipt.txHash.slice(0, 6)}…${receipt.txHash.slice(-4)}`,
+        meta: `Arc Testnet · Block ${proof.blockNumber.toLocaleString()} · ${proof.txHash.slice(0, 6)}…${proof.txHash.slice(-4)}`,
         badge: 'Confirmed',
         status: 'completed',
       },
     }
 
     return [...baseNodes, ...stepNodes, decisionNode]
-  }, [receipt])
+  }, [proof])
 
   const edges: Edge[] = useMemo(() => {
-    const allIds = ['trigger', ...receipt.steps.map((_, i) => `step-${i}`), 'decision']
+    const allIds = ['trigger', ...proof.steps.map((_, i) => `step-${i}`), 'decision']
     return allIds.slice(0, -1).map((id, i) => ({
       id: `e${i}`,
       source: id,
@@ -64,7 +64,7 @@ export function WorkflowCanvas({ receipt }: Props) {
       type: 'smoothstep',
       style: { stroke: 'hsl(214, 32%, 82%)', strokeWidth: 1.5 },
     }))
-  }, [receipt])
+  }, [proof])
 
   return (
     <div
