@@ -1,0 +1,9 @@
+{
+  "complianceApiUrl": "COMPLIANCE_API_URL_HERE",
+  "underwritingApiUrl": "UNDERWRITING_API_URL_HERE",
+  "complianceApiKeyOwner": "DYNAMIC_SERVER_WALLET_ADDRESS_HERE",
+  "underwritingApiKeyOwner": "DYNAMIC_SERVER_WALLET_ADDRESS_HERE",
+  "dairyPriceMockUsdPerLb": 2.13,
+  "defaultBusinessName": "SMB",
+  "authorizedKeys": []
+}
