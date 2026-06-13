@@ -1,3 +1,7 @@
 sponsors-docs/
 idea-dump/
 .claude/settings.local.json
+receipt.json
+.wallet-state.json
+node_modules/
+dist/
