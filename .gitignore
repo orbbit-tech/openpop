@@ -5,5 +5,8 @@ receipt.json
 .wallet-state.json
 node_modules/
 dist/
+contracts/artifacts/
+contracts/cache_hardhat/
+contracts/out/
 .env.local
 .env
