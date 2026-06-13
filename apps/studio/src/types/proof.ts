@@ -1,4 +1,4 @@
-export type Receipt = {
+export type Proof = {
   companyName: string
   invoiceAmount: string
   compliant: boolean

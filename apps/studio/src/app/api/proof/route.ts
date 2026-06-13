@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readFile } from 'fs/promises'
 import path from 'node:path'
-import type { Receipt } from '../../../types/receipt'
+import type { Proof } from '../../../types/proof'
 
 export async function GET(_request?: NextRequest): Promise<NextResponse> {
   let raw: string
@@ -12,12 +12,12 @@ export async function GET(_request?: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: 'no proof found' }, { status: 404 })
   }
 
-  let receipt: Receipt
+  let proof: Proof
   try {
-    receipt = JSON.parse(raw) as Receipt
+    proof = JSON.parse(raw) as Proof
   } catch {
     return NextResponse.json({ error: 'proof.json contains invalid JSON' }, { status: 500 })
   }
 
-  return NextResponse.json(receipt)
+  return NextResponse.json(proof)
 }
