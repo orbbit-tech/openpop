@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat'
+import hre from 'hardhat'
 
 const DEPOSIT_AMOUNT = 50_000_000_000n // 50k USDC at 6 decimals
 
@@ -10,8 +10,8 @@ async function main() {
   if (!recipientAddress) throw new Error('RECIPIENT_ADDRESS not set')
   if (!usdcAddress) throw new Error('USDC_ADDRESS not set')
 
-  const escrow = await ethers.getContractAt('ProofGatedEscrow', escrowAddress)
-  const usdc = await ethers.getContractAt('MockERC20', usdcAddress)
+  const escrow = await hre.ethers.getContractAt('ProofGatedEscrow', escrowAddress)
+  const usdc = await hre.ethers.getContractAt('MockERC20', usdcAddress)
 
   const tx1 = await escrow.createDeal(recipientAddress)
   await tx1.wait()

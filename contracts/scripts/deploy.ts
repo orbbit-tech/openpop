@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat'
+import hre from 'hardhat'
 
 const MOCK_KEYSTONE_FORWARDER = '0x6E9EE680ef59ef64Aa8C7371279c27E496b5eDc1'
 
@@ -6,10 +6,10 @@ async function main() {
   const usdcAddress = process.env.USDC_ADDRESS
   if (!usdcAddress) throw new Error('USDC_ADDRESS not set')
 
-  const [deployer] = await ethers.getSigners()
+  const [deployer] = await hre.ethers.getSigners()
   console.log('Deploying from:', deployer.address)
 
-  const Escrow = await ethers.getContractFactory('ProofGatedEscrow')
+  const Escrow = await hre.ethers.getContractFactory('ProofGatedEscrow')
   const escrow = await Escrow.deploy(usdcAddress, MOCK_KEYSTONE_FORWARDER)
   await escrow.waitForDeployment()
 
