@@ -68,7 +68,7 @@ RECIPIENT_ADDRESS=0xRecipientWallet                         # receives USDC on a
 npx hardhat compile
 ```
 
-### Step 4 — deploy
+### Step 4 — deploy and verify
 
 ```bash
 npx hardhat run scripts/deploy.ts --network arc-testnet
@@ -83,6 +83,14 @@ PROOF_GATED_ESCROW_ADDRESS=0x...
 Add the printed address to `../.env.local`:
 ```
 PROOF_GATED_ESCROW_ADDRESS=0x...
+```
+
+Then verify the source on [testnet.arcscan.app](https://testnet.arcscan.app):
+
+```bash
+npx hardhat verify --network arc-testnet <PROOF_GATED_ESCROW_ADDRESS> \
+  "0x3600000000000000000000000000000000000000" \
+  "0x6E9EE680ef59ef64Aa8C7371279c27E496b5eDc1"
 ```
 
 ### Step 5 — get USDC from faucet

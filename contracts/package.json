@@ -11,6 +11,7 @@
     "@nomicfoundation/hardhat-ethers": "^4.0.13",
     "@nomicfoundation/hardhat-foundry": "^3.0.4",
     "@nomicfoundation/hardhat-keystore": "^3.0.12",
+    "@nomicfoundation/hardhat-verify": "^3.0.20",
     "hardhat": "^3.9.0",
     "typescript": "^5.0.0"
   },
