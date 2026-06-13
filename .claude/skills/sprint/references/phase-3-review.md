@@ -166,7 +166,7 @@ Post this before handing off to the human to merge. Always post it, even if ever
 - Mark issue Done
 - Add comment: `Verified. PR: [url]. Spec: [path]`
 
-Then delete the issue directory (`specs/[project]/[milestone]/[issue-id-slug]/`) including `spec.md` and `test.md`. Ask: "Next issue from backlog, or new intent?"
+Then ask: "Next issue from backlog, or new intent?"
 
 ---
 
