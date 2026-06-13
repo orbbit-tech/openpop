@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "playwright-mcp": {
+      "_note": "stdio — spawns per session (~36 MB each). Generally prefer chrome MCP (claude-in-chrome) instead.",
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "playwright-mcp"]
+    },
+    "arc-docs": {
+      "type": "http",
+      "url": "https://docs.arc.io/mcp"
+    },
+    "dynamic": {
+      "type": "http",
+      "url": "https://www.dynamic.xyz/docs/mcp"
+    }
+  }
+}
