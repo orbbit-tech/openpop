@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import {Test} from "forge-std/Test.sol";
-import {ProofGatedEscrow} from "../../contracts/ProofGatedEscrow.sol";
+import {ProofGatedEscrow} from "../../src/ProofGatedEscrow.sol";
 import {MockERC20, MockForwarder} from "../helpers/ProofGatedEscrowMocks.sol";
 
 // ── Base ──────────────────────────────────────────────────────────────────────
