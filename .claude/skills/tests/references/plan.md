@@ -4,77 +4,104 @@
 
 **Why:** Tests derived from the spec — not from the code — make sure every stated requirement gets checked.
 
-**How:** Read the spec, identify every behavior the code being tested must exhibit, list them ordered by importance, and wait for approval before writing any code.
+**How:** Read the spec, identify the layer, derive the test list ordered by method, write to `test.md`, and wait for approval before writing any code.
+
+---
+
+## Test Categories
+
+Every test in this project belongs to exactly one of three categories.
+
+| Category | What it tests | Runner | Reference |
+|---|---|---|---|
+| **Unit** | A single pure TypeScript function in isolation | `vitest` | `ts-unit.md` |
+| **Integration** | A component boundary requiring real infrastructure (local Hardhat node or real `receipt.json`) | `vitest` (routes) · `hardhat test` (contracts) | `nextjs-api.md` · `contracts.md` |
+| **E2E** | Full pipeline — CRE CLI → Arc testnet → UI | `pnpm run pipeline` + manual check | (script, not a test file) |
+
+### Which category does this test belong to?
+
+Ask one question: **what does this test require to be running?**
+
+- Nothing external (pure function, mock I/O) → **Unit**
+- A local Hardhat node OR a real `receipt.json` on disk → **Integration**
+- Arc testnet + CRE CLI + running Next.js UI → **E2E**
+
+### OpenPop mapping
+
+| Subject | Category | Why |
+|---|---|---|
+| `wallet.ts` helper functions | Unit | Pure signing logic, mock Dynamic SDK |
+| MCP `get_proof` handler logic | Unit | Pure file read + return, mock `fs/promises` |
+| CRE step functions (if extracted) | Unit | Pure computation, no CRE runtime |
+| `/api/receipt` route handler | Integration | Reads a real file path; tests wiring of handler → response |
+| `/api/mcp` route handler | Integration | Wires MCP tool call → receipt read → JSON response |
+| `ProofGatedEscrow` contract | Integration | Requires local Hardhat node; tests on-chain policy logic |
+| `MockKeystoneForwarder` contract | Integration | Requires local Hardhat node; validates signature acceptance |
+| Full pipeline (CRE → receipt → Arc tx → UI) | E2E | Requires CRE CLI, Arc testnet, running app |
 
 ---
 
 ## Step 1 · Identify testable behaviors
 
-**If the spec contains a logic diagram (flowchart, SOP, sequence diagram), read the diagram first — it is the primary source of tests.** Map graph elements to tests in this order:
+**If the spec contains a Core Logic diagram, read it first — it is the primary source of tests.** Map each branch arm and blocking condition to a test.
 
-| Graph element | Tests to write | Category tag |
-|---|---|---|
-| Branch arm (diamond node) | One per arm — does the subject take the right path when the condition is true? | happy-path / unhappy-path |
-| Blocking wait / condition node | One per node — does the subject actually stay blocked until the condition is met? | invariant |
-| Always/Never invariant in spec not covered above | One per invariant | invariant |
+Classify every behavior with one tag:
 
-Identify testable behaviors from the spec text using these questions:
-
-| Category | Question |
+| Tag | Question |
 |---|---|
 | [happy-path] | What is the correct outcome for valid input — return value, state change, or side effect? |
-| [boundary] | Are edge-case inputs handled safely — null, empty, min/max values, invalid format? |
+| [boundary] | Are edge-case inputs handled safely — null, empty, min/max, invalid format? |
 | [unhappy-path] | Does it fail gracefully for bad input or error state — right error type, no state corruption? |
-| [invariant] | What property must always hold or never occur, regardless of input? |
 
 ---
 
-## Step 2 · Group by method name; categorize within each method
+## Step 2 · Group by service → entity → method
 
-**Outer grouping = method name.** Each method gets its own bold heading. Tests within the method are listed with their category tag and a plain English description of what happens — not repeating the method name.
+**Top level:** bold service or contract name.
 
-**Optional higher-level grouping by domain** — only when the subject has two or more meaningfully distinct entity types (e.g. Verification vs Report vs Decision). If the subject has one entity type, skip the domain level and go straight to method headings.
+**Second level (optional):** bold entity group — only when the subject has two or more meaningfully distinct entity types (e.g. `Receipt` vs `Policy`). Skip this level when the service has one entity type.
 
-**Within each method, order by category:**
+**Third level:** bold method name.
+
+**Within each method, order by tag:**
 1. [happy-path] — valid input, expected return value or state change
 2. [boundary] — edge-case inputs (null, empty, min/max)
 3. [unhappy-path] — bad input or error state, correct failure behavior
-4. [invariant] — properties that must always hold or never occur
 
-**Test descriptions are plain English business intent** — describe what the system does in that case, not the implementation detail. The method name is already the heading; do not repeat it in the description.
+**Test descriptions are plain English business intent** — describe what the system does in that case, not the implementation detail.
 
-- Good: `[happy-path] a new assessment opens in pending state`
-- Bad: `[happy-path] createAssessment opens a new assessment in pending state` ← method name repeated
+- Good: `[happy-path] a new verification record is opened for a business starting KYB`
+- Bad: `[happy-path] createVerification inserts a row with status awaiting_report` ← implementation detail
 
 ---
 
 ## Step 3 · Write test.md and wait for approval
 
-Write the test plan to `specs/.../issue-id-slug/test.md` in the worktree. Print only the file path — never print the file contents in the terminal. The human opens the file in VS Code to review.
+Write the test plan to `specs/.../issue-id-slug/test.md`. Print only the file path — never print the file contents in the terminal.
 
 ```markdown
 # Test Plan · [Issue title]
 
-**Layer:** [layer]
+**Layer:** [BE unit / FE unit / Contract / Next.js API / etc.]
 
-**File:** `[path/to/file.test.ts]`
+**File:** `path/to/file.test.ts`
 
-**Run:** `[command to execute the tests]`
+**Run:** `pnpm nx test <project-name>` (or `npx hardhat test`)
 
 ---
 
 ## Tests
 
-**SubjectClass**
+**ServiceOrContractName**
 
-- **[Domain]** ← optional, only when 2+ distinct entity types exist
+- **EntityGroup** (omit this level if only one entity type)
   - **methodName**
     - [happy-path] plain English description
-    - [boundary] plain English description
-    - [unhappy-path] plain English description
-    - [invariant] plain English description
+    - [happy-path] second distinct case
+    - [boundary] edge-case description
+    - [unhappy-path] error case description
 
-- **methodName** ← use directly when no domain grouping
+- **methodName** (when no entity grouping)
   - [happy-path] plain English description
   - [unhappy-path] plain English description
 ```

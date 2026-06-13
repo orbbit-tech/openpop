@@ -112,7 +112,7 @@ contracts/
 │   ├── submitProof(receipt)    ← called by Dynamic server wallet
 │   ├── _verifySignature()      ← verifies against MockKeystoneForwarder (L0) or real forwarder (L2)
 │   ├── _checkPolicy()          ← compliant === true AND score ≥ 650
-│   ├── _release()              ← USDC → Sneehee's address
+│   ├── _release()              ← USDC → SMB's address
 │   └── _lock()                 ← funds stay locked; reason code on-chain
 ├── MockKeystoneForwarder.sol   ← accepts locally-signed receipts (deployed by --broadcast)
 └── hardhat.config.ts           ← Arc testnet RPC + deployer wallet
@@ -168,7 +168,7 @@ scripts/
 pnpm run pipeline
 # → proof.json written with real signature + txHash
 # → Arc contract status → "funded"
-# → USDC in Sneehee's wallet
+# → USDC in SMB's wallet
 ```
 
 ---
@@ -217,11 +217,11 @@ Everything that must be live for judges to interact.
 
 Add investor deposit flow. One additional widget on `/invest`. One webhook endpoint.
 
-- Dynamic Flow widget renders on `/invest` — Aaron deposits from any wallet/chain
+- Dynamic Flow widget renders on `/invest` — investor deposits from any wallet/chain
 - Webhook `/api/flow-webhook` receives deposit confirmation → updates UI status
 - Escrow balance reads live from Arc contract
 
-**Done when:** Aaron deposits USDC via Flow widget on the public URL; escrow balance updates.
+**Done when:** investor deposits USDC via Flow widget on the public URL; escrow balance updates.
 
 ---
 

@@ -71,19 +71,19 @@ Print at the top of every response without exception.
 - **How:** Reject any Zone 1 check that doesn't name a stage. If the user can't articulate which stage, continue grilling before drafting.
 
 **Core Logic Diagram Is Specific and Non-Placeholder**
-- **What:** Every node is a noun or verb specific to this issue; edges are directional; forbidden paths are explicit via a `Never:` constraint or marked edge.
+- **What:** Every node is a noun or verb specific to this issue; edges are directional; error paths are explicit. Below the diagram, a `### Business rules` section lists the invariants as plain bullets — one rule per bullet, each traceable to at least one test.
 - **Why:** Generic labels ("process", "handle", "manage") produce a diagram that could describe any system — it conveys no intent and cannot be verified against the implementation.
-- **How:** If the diagram cannot be drawn with specific nodes, the design is not ready. Block approval until it can.
+- **How:** If the diagram cannot be drawn with specific nodes, the design is not ready. Block approval until it can. If a rule cannot be expressed as a plain bullet with a clear pass/fail condition, it belongs in the diagram as an explicit edge instead.
 
 **Every Verify Clause Is a Runnable Command**
 - **What:** Each Action Item's Verify line is a pasteable shell command with a deterministic expected output — binary pass/fail, no "should" or "approximately".
 - **Why:** A non-runnable verify clause cannot gate Phase 2 build — the test derivation step requires a verifiable acceptance criterion per item.
 - **How:** If an item cannot be verified with one command, split it into smaller items until each one can.
 
-**Action Items Describe What, Never How**
-- **What:** Each `Implement:` line names the artifact to create or modify and its purpose in one sentence. It never lists imports, function signatures, variable names, parameter lists, or line-by-line instructions.
-- **Why:** Listing every import and every line turns the spec into pseudocode — the implementer is no longer making decisions, they are transcribing. That is Zone 2: the spec is cheap to write but verification requires reading the whole implementation to check whether the pseudocode was followed correctly. The Core Logic section and diagram already capture design intent; the Action Item just names the file and what it contributes.
-- **How:** If an `Implement:` line contains a code snippet, a function signature, an import path beyond the file being created, or more than two sub-bullets, strip it back to: file path + one-sentence purpose. Move any structural detail that is genuinely load-bearing into the Core Logic section instead.
+**Action Items Describe What, Not How**
+- **What:** Each `Implement:` line names the artifact and its purpose. It may include a sub-bullet list of the methods or behaviors the artifact must expose — but only when that list is load-bearing (i.e. the implementer cannot derive it from the Core Logic diagram alone). It never includes imports, function signatures with parameter types, variable names, or line-by-line instructions.
+- **Why:** A flat one-liner is too vague when an artifact has multiple distinct behaviors that each have their own verify clause. But a sub-bullet list of method names + one-phrase description is still design intent, not pseudocode — the implementer still decides the implementation.
+- **How:** If an `Implement:` line needs sub-bullets, each bullet is `method — one phrase describing its behavior`. Cap at the number of methods the artifact actually has. If a sub-bullet starts describing how a method works internally (conditionals, loops, data shapes), move that to Core Logic instead.
 
 **Overview Stays at Business Reasoning Level**
 - **What:** The Overview's What/Why/How fields must describe the business outcome, the business need, and the strategic approach — not implementation details. No framework names, file paths, config patterns, package names, or schema shapes belong in the Overview.
@@ -124,8 +124,10 @@ Draft the spec in plain English using this structure:
 [flowchart or stateDiagram — graspable in 30 seconds by someone who hasn't read the text]
 ```
 
-- Always: [invariant that holds at every node in the diagram]
-- Never:  [condition whose presence means the system is in an error state]
+### Business rules
+
+- [one rule per bullet — forward-only transitions, idempotency guarantees, atomicity requirements, error conditions]
+- [each rule maps to at least one testable behavior in test.md]
 
 ---
 

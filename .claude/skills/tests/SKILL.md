@@ -7,7 +7,7 @@ description: Derive and write tests from a spec file Action Items and Core Logic
 
 **What:** Read a spec file, load the reference for the layer being tested, derive a Test Plan, iterate on it until approved, then write test code.
 
-**Why:** Tests written from the spec bind verification to stated intent — a written, iterable `test.md` lets the human refine coverage without reading TypeScript.
+**Why:** Tests written from the spec bind verification to stated intent — a written, iterable `test.md` lets the human refine coverage without reading TypeScript or Solidity.
 
 **How:** Read `spec.md` → identify the layer → load the layer reference → derive the Test Plan → write it to `test.md` (sibling of `spec.md`) → iterate until approved → write test code.
 
@@ -56,11 +56,25 @@ Print at the top of every response without exception.
 **Example:**
 ```
 ▶ /tests · awaiting approval
-  🏗️ Layer:   BE unit
-  📋 Plan:    specs/01-invoice-factoring/01-foundation/TECH-42-add-invoice-endpoint/test.md
-  📄 File:    apps/bff/src/invoices/invoices.service.test.ts
+  🏗️ Layer:   Contracts
+  📋 Plan:    specs/02-b-smart-contract/test.md
+  📄 File:    contracts/test/ProofGatedEscrow.test.ts
   🔄 Status:  awaiting approval
 ```
+
+## Test Categories (must appear in spec.md and test.md)
+
+Every testable behavior must be tagged with one of three categories. This tag must appear in both spec.md action items and the test.md overview table.
+
+| Category | What it covers | When to use |
+|---|---|---|
+| **[unit]** | Pure TypeScript function, no real I/O | `wallet.ts` helpers, MCP handler logic, CRE step functions |
+| **[integration]** | Component boundary requiring local infrastructure | `/api/receipt`, `/api/mcp` routes, `ProofGatedEscrow` contract |
+| **[e2e]** | Full pipeline — CRE CLI → Arc testnet → UI | Manual `pnpm run pipeline` + UI check; no automated test file |
+
+See `references/plan.md` for the full mapping and `test.md` format including the required Overview table.
+
+---
 
 ## Hard Rules
 
@@ -78,3 +92,20 @@ Print at the top of every response without exception.
 - **What:** File location, import style, describe/it structure, assertion library — all come from the layer reference. Do not improvise.
 - **Why:** Improvised structure produces tests that pass locally but don't integrate with the test runner or CI config — the layer reference encodes those constraints.
 - **How:** Open the layer reference before writing any code and follow it line by line.
+
+## Layers in This Project
+
+| Layer | When to use | Reference |
+|---|---|---|
+| **TS Unit** | Pure TypeScript logic: `wallet.ts`, MCP `get_proof` handler, CRE step functions extracted for testing | `references/ts-unit.md` |
+| **Contracts** | Solidity: `ProofGatedEscrow`, `MockKeystoneForwarder` | `references/contracts.md` |
+| **Next.js API** | Next.js route handlers: `/api/receipt`, `/api/mcp` | `references/nextjs-api.md` |
+
+## References
+
+| Description | File |
+|---|---|
+| Test planning — derivation logic and Test Plan Format | `references/plan.md` |
+| TypeScript unit test conventions (wallet, MCP, CRE step logic) | `references/ts-unit.md` |
+| Solidity / Hardhat contract test conventions | `references/contracts.md` |
+| Next.js API route test conventions | `references/nextjs-api.md` |

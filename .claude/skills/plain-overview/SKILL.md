@@ -19,9 +19,13 @@ flowchart TD
     READ["Read current What / Why / How from spec.md"]
     REWRITE["Rewrite each section — business logic, plain English only"]
     WRITE["Write rewritten section back to spec.md"]
+    DIAGRAM{"Core Logic diagram\nexists in spec?"}
+    PLAIN["/plain-diagram — rewrite diagram\nplain English labels, subgraphs, no jargon"]
     DONE(["Done"])
 
-    START --> READ --> REWRITE --> WRITE --> DONE
+    START --> READ --> REWRITE --> WRITE --> DIAGRAM
+    DIAGRAM -- "yes" --> PLAIN --> DONE
+    DIAGRAM -- "no" --> DONE
 ```
 
 ## Structured Output: Plain Overview
