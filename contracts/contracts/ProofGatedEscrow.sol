@@ -2,16 +2,12 @@
 pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-
-/// @notice Chainlink Keystone Forwarder — verifies that a receipt was signed by a BFT quorum of CRE nodes.
-interface IKeystoneForwarder {
-    function verify(bytes calldata data) external view returns (bool);
-}
+import {ReceiverTemplate} from "./interfaces/ReceiverTemplate.sol";
 
 /**
  * @title ProofGatedEscrow
  * @notice Holds USDC for multiple deals and releases funds to the recipient only when a
- *         Chainlink CRE-signed receipt passes signature verification.
+ *         Chainlink CRE-signed receipt is delivered by the trusted Keystone Forwarder.
  *
  * @dev State machine per deal: AWAITING_DEPOSIT → FUNDED → RELEASED
  *                                                       └→ REJECTED
@@ -20,10 +16,14 @@ interface IKeystoneForwarder {
  *      underwriting scores) belongs in the CRE workflow that produces the signed receipt —
  *      not here. The contract's only question: did the Chainlink network sign off on this?
  *
+ *      Implements IReceiver.onReport — the Keystone Forwarder is the sole caller authorised
+ *      to deliver results. Access control is enforced by the ReceiverTemplate onlyForwarder
+ *      modifier; no signature verification is needed inside this contract.
+ *
  *      One contract handles every deal via a mapping — deploying a new contract per deal
  *      is not required.
  */
-contract ProofGatedEscrow {
+contract ProofGatedEscrow is ReceiverTemplate {
     // ── Enums ─────────────────────────────────────────────────────────────────
 
     /**
@@ -57,9 +57,6 @@ contract ProofGatedEscrow {
 
     /// @notice USDC token this contract holds and releases.
     IERC20 public immutable usdc;
-
-    /// @notice Chainlink Keystone Forwarder — the sole trusted source of verified receipts.
-    IKeystoneForwarder public immutable forwarder;
 
     /// @notice Deals keyed by their on-chain ID.
     mapping(uint256 => Deal) public deals;
@@ -100,9 +97,8 @@ contract ProofGatedEscrow {
 
     // ── Constructor ───────────────────────────────────────────────────────────
 
-    constructor(address usdc_, address forwarder_) {
+    constructor(address usdc_, address forwarder_) ReceiverTemplate(forwarder_) {
         usdc = IERC20(usdc_);
-        forwarder = IKeystoneForwarder(forwarder_);
         nextDealId = 1;
     }
 
@@ -144,29 +140,19 @@ contract ProofGatedEscrow {
     }
 
     /**
-     * @notice Verifies a CRE-signed receipt and either releases funds to the recipient
-     *         or locks them permanently.
-     * @dev The forwarder is the trust boundary — it enforces that the signature came from
-     *      a BFT quorum of Chainlink CRE nodes. The operator cannot pass this check by
-     *      submitting hand-crafted data; only the network can produce a valid signature.
+     * @notice Receives a Chainlink Keystone report and either releases funds to the recipient
+     *         or marks the deal as rejected.
+     * @dev    Called exclusively by the Keystone Forwarder (enforced via onlyForwarder).
+     *         The report bytes are ABI-decoded as (uint256 dealId, bool approved).
+     *         metadata is unused in this implementation.
      *
-     *      Policy evaluation (compliance thresholds, underwriting scores) is the CRE
-     *      workflow's responsibility. The contract only acts on the verdict the network
-     *      already reached consensus on.
-     *
-     * @param dealId   The deal this proof corresponds to.
-     * @param approved The verdict reached by the CRE workflow — true releases funds.
-     * @param sig      Raw bytes forwarded to the Keystone Forwarder for verification.
+     * @param metadata Unused Keystone metadata header.
+     * @param report   ABI-encoded (uint256 dealId, bool approved) verdict from the CRE workflow.
      */
-    function submitProof(uint256 dealId, bool approved, bytes calldata sig) external {
+    function onReport(bytes calldata metadata, bytes calldata report) external override onlyForwarder {
+        (uint256 dealId, bool approved) = abi.decode(report, (uint256, bool));
         Deal storage deal = deals[dealId];
         require(deal.state == State.FUNDED, "ProofGatedEscrow: funds not locked");
-
-        /*
-         * Verify the signature before acting on the verdict — if the forwarder
-         * rejects, approved is untrusted and nothing changes.
-         */
-        require(forwarder.verify(abi.encode(approved, sig)), "ProofGatedEscrow: invalid signature");
 
         if (approved) {
             _release(dealId, deal);
