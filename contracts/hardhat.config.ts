@@ -16,7 +16,7 @@ export default defineConfig({
   plugins: [hardhatFoundry, hardhatEthers, hardhatKeystore],
   solidity: "0.8.24",
   paths: {
-    sources: "contracts",
+    sources: "src",
     cache: "cache_hardhat",
   },
   networks: {
