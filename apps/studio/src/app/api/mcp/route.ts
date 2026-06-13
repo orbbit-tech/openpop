@@ -13,10 +13,16 @@ type JsonRpcBody = {
   }
 }
 
+/**
+ * Stateless MCP Streamable HTTP endpoint (protocol 2025-03-26).
+ * Each POST is a self-contained JSON-RPC exchange — no session or streaming needed
+ * because get_proof is a single read with no side effects.
+ */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const body = (await request.json()) as JsonRpcBody
   const { method, params } = body
 
+  // MCP handshake — callers send this first to confirm the protocol version.
   if (method === 'initialize') {
     return NextResponse.json({
       protocolVersion: '2025-03-26',
@@ -25,6 +31,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     })
   }
 
+  // Capability discovery — advertise the one tool this server exposes.
   if (method === 'tools/list') {
     return NextResponse.json({
       tools: [
@@ -65,6 +72,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
+    // MCP tool results are always a content array — text block is the standard shape
+    // for a tool that returns a structured payload as a string.
     return NextResponse.json({
       content: [{ type: 'text', text: JSON.stringify(receipt) }],
     })

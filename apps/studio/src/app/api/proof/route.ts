@@ -8,6 +8,7 @@ export async function GET(_request?: NextRequest): Promise<NextResponse> {
   try {
     raw = await readFile(path.join(process.cwd(), 'proof.json'), 'utf-8')
   } catch {
+    // 404, not 500 — absence is expected before the first workflow run.
     return NextResponse.json({ error: 'no proof found' }, { status: 404 })
   }
 

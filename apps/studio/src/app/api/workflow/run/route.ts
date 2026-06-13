@@ -26,6 +26,7 @@ type CREResult = {
 }
 
 export async function POST(_request?: NextRequest): Promise<NextResponse> {
+  // Next.js runs from apps/studio/, so the cwd must point two levels up to reach cre/loan/.
   const result = spawnSync('cre', ['workflow', 'simulate', '--broadcast'], {
     cwd: path.join(process.cwd(), '../../cre/loan'),
     encoding: 'utf-8',
@@ -38,6 +39,7 @@ export async function POST(_request?: NextRequest): Promise<NextResponse> {
     )
   }
 
+  // Guard before shaping — proof.json must never be written from a partial result.
   let cre: CREResult
   try {
     cre = JSON.parse(result.stdout) as CREResult
@@ -59,6 +61,8 @@ export async function POST(_request?: NextRequest): Promise<NextResponse> {
     approved: cre.underwriting.approved,
     confidence: 91,
     dairyPrice: cre.dairyPrice.price,
+    // txHash, signature, consensus, and blockNumber are stand-ins — MockKeystoneForwarder
+    // accepts any bytes for the signature until the real CRE broadcast is wired.
     txHash: '0xMOCK_TX',
     signature: '0xMOCK_SIG',
     timestamp: cre.timestamp,
