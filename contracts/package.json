@@ -8,7 +8,8 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-foundry": "^1.1.0",
-    "hardhat": "^2.22.0",
+    "@nomicfoundation/hardhat-keystore": "^3.0.12",
+    "hardhat": "^3.9.0",
     "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
   },
