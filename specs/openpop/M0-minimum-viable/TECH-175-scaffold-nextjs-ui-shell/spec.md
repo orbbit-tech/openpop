@@ -86,7 +86,7 @@ apps/demo-ui/
 
 ## Action Items
 
-**[ ] Scaffold Next.js app with Tailwind and shadcn**
+**[x] Scaffold Next.js app with Tailwind and shadcn**
 
 Implement: Create `apps/demo-ui/` as a standalone Next.js 14 app with TypeScript, App Router, and Tailwind enabled, then initialise shadcn and install `@xyflow/react`.
 
@@ -100,7 +100,7 @@ echo "pass"
 
 ---
 
-**[ ] Wire design tokens**
+**[x] Wire design tokens**
 
 Implement: Define `src/app/globals.css` with the full CSS variable system — primary teal `hsl(180, 85%, 32%)`, slate base colors, radius tokens, dark mode variables — and configure `tailwind.config.ts` to map those variables to Tailwind utilities.
 
@@ -112,7 +112,7 @@ cd apps/demo-ui && npm run build && echo "pass"
 
 ---
 
-**[ ] Create Receipt type and mock fixture**
+**[x] Create Receipt type and mock fixture**
 
 Implement: Create `src/types/receipt.ts` defining the `Receipt` type and `src/lib/fixtures.ts` exporting a hardcoded mock receipt (score 82, compliant, approved, three CRE step labels, simulated CRE signature and Arc testnet tx hash).
 
@@ -124,7 +124,7 @@ cd apps/demo-ui && npx tsc --noEmit && echo "pass"
 
 ---
 
-**[ ] Human-view components**
+**[x] Human-view components**
 
 Implement: Build `Nav.tsx` (OpenPop logo, proof ID badge, For Agents button), `human/VerdictCard.tsx` (decision badge, score, confidence), `human/WorkflowCanvas.tsx` + `human/ProofNode.tsx` (pipeline graph: Compliance → Dairy Price Oracle → Underwriting → Decision Recorded), and `human/AttestationBar.tsx` (prover identity, 7/9 consensus, block number, tx hash).
 
@@ -136,7 +136,7 @@ cd apps/demo-ui && npm run build && echo "pass"
 
 ---
 
-**[ ] Agent-view components**
+**[x] Agent-view components**
 
 Implement: Build `agent/AgentSheet.tsx` using the shadcn Sheet component (dark panel, opens on For Agents button click), `agent/RawReceipt.tsx` (renders the signed receipt fixture as formatted JSON), and `agent/McpSnippet.tsx` (shows the `get_proof` tool definition and `openpop-mcp` install one-liner).
 
@@ -148,7 +148,7 @@ cd apps/demo-ui && npm run build && echo "pass"
 
 ---
 
-**[ ] Wire root page**
+**[x] Wire root page**
 
 Implement: Update `src/app/page.tsx` to import the fixture and compose all components with `sheetOpen` boolean state driving AgentSheet open/close.
 
