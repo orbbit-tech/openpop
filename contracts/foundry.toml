@@ -1,0 +1,17 @@
+[profile.default]
+src = "contracts"
+test = "test"
+out = "out"
+cache_path = "cache_foundry"
+libs = ["lib", "node_modules"]
+solc = "0.8.24"
+evm_version = "cancun"
+remappings = [
+  "@openzeppelin/contracts/=node_modules/@openzeppelin/contracts/"
+]
+
+[profile.default.fuzz]
+runs = 10000
+
+[profile.toolchain]
+channel = "stable"

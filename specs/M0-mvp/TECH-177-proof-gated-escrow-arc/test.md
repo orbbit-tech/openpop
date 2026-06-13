@@ -1,16 +1,16 @@
-# Test Plan · ProofEscrow on Arc
+# Test Plan · ProofGatedEscrow on Arc
 
 **Layer:** Contract unit
 
-**File:** `contracts/test/ProofEscrow.test.ts`
+**File:** `contracts/test/ProofGatedEscrow/ProofGatedEscrow.t.sol`
 
-**Run:** `cd contracts && npx hardhat test`
+**Run:** `cd contracts && forge test`
 
 ---
 
 ## Tests
 
-**ProofEscrow**
+**ProofGatedEscrow**
 
 - **depositUSDC**
   - [happy-path] investor deposits USDC and the full amount is locked inside the contract
