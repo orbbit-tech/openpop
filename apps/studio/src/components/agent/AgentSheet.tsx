@@ -4,24 +4,24 @@ import {
   Sheet,
   SheetContent,
 } from '@/components/ui/sheet'
-import type { Receipt } from '@/types/receipt'
-import { RawReceipt } from './RawReceipt'
+import type { Proof } from '@/types/proof'
+import { RawProof } from './RawProof'
 import { McpSnippet } from './McpSnippet'
 
 interface Props {
   open: boolean
   onClose: () => void
-  receipt: Receipt
+  proof: Proof
 }
 
-export function AgentSheet({ open, onClose, receipt }: Props) {
+export function AgentSheet({ open, onClose, proof }: Props) {
   return (
     <Sheet open={open} onOpenChange={(isOpen: boolean) => { if (!isOpen) onClose() }}>
       <SheetContent
         side="right"
         showCloseButton={false}
-        className="p-0 border-0 w-full sm:max-w-[520px] overflow-hidden"
-        style={{ background: '#121212', borderLeft: '1px solid hsl(215, 14%, 22%)' }}
+        className="p-0 border-0 w-full overflow-hidden"
+        style={{ background: '#121212', borderLeft: '1px solid hsl(215, 14%, 22%)', maxWidth: 760 }}
       >
         {/* Header */}
         <div
@@ -79,7 +79,7 @@ export function AgentSheet({ open, onClose, receipt }: Props) {
             scrollbarColor: 'hsl(215, 14%, 22%) transparent',
           }}
         >
-          <RawReceipt receipt={receipt} />
+          <RawProof proof={proof} />
           <McpSnippet />
         </div>
       </SheetContent>
