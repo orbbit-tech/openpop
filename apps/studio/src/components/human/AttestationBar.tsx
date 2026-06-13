@@ -1,11 +1,11 @@
-import type { Receipt } from '@/types/receipt'
+import type { Proof } from '@/types/proof'
 
 interface Props {
-  receipt: Receipt
+  proof: Proof
 }
 
-export function AttestationBar({ receipt }: Props) {
-  const txShort = `${receipt.txHash.slice(0, 6)}…${receipt.txHash.slice(-4)}`
+export function AttestationBar({ proof }: Props) {
+  const txShort = `${proof.txHash.slice(0, 6)}…${proof.txHash.slice(-4)}`
 
   return (
     <div
@@ -22,13 +22,13 @@ export function AttestationBar({ receipt }: Props) {
         color: 'var(--text-2)',
       }}
     >
-      <AttestItem label="Prover">{receipt.prover}</AttestItem>
+      <AttestItem label="Prover">{proof.prover}</AttestItem>
       <Sep />
       <AttestItem label="Consensus">
-        {receipt.consensus.agreed} / {receipt.consensus.total} nodes
+        {proof.consensus.agreed} / {proof.consensus.total} nodes
       </AttestItem>
       <Sep />
-      <AttestItem label="Block">Arc {receipt.blockNumber.toLocaleString()}</AttestItem>
+      <AttestItem label="Block">Arc {proof.blockNumber.toLocaleString()}</AttestItem>
       <Sep />
       <AttestItem label="Tx" mono>{txShort}</AttestItem>
     </div>

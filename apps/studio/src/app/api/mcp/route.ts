@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readFile } from 'fs/promises'
 import path from 'node:path'
-import type { Receipt } from '../../../types/receipt'
+import type { Proof } from '../../../types/proof'
 
 type JsonRpcBody = {
   jsonrpc: string
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       tools: [
         {
           name: 'get_proof',
-          description: 'Read the signed OpenPop receipt from the last CRE simulation run',
+          description: 'Read the signed OpenPop proof from the last CRE simulation run',
           inputSchema: { type: 'object', properties: {} },
         },
       ],
@@ -62,9 +62,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    let receipt: Receipt
+    let proof: Proof
     try {
-      receipt = JSON.parse(raw) as Receipt
+      proof = JSON.parse(raw) as Proof
     } catch {
       return NextResponse.json(
         { error: { code: -32603, message: 'invalid proof JSON' } },
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     // MCP tool results are always a content array — text block is the standard shape
     // for a tool that returns a structured payload as a string.
     return NextResponse.json({
-      content: [{ type: 'text', text: JSON.stringify(receipt) }],
+      content: [{ type: 'text', text: JSON.stringify(proof) }],
     })
   }
 
