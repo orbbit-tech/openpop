@@ -17,7 +17,7 @@ contracts/
 │       └── ProofGatedEscrow.t.sol  # 9 Forge unit tests
 ├── scripts/
 │   ├── deploy.ts                   # deploys ProofGatedEscrow
-│   └── setup.ts                    # creates deal + deposits 50k USDC
+│   └── setup.ts                    # creates deal + deposits 50 USDC (from faucet)
 ├── foundry.toml
 └── hardhat.config.ts               # Arc testnet network config
 ```
@@ -85,7 +85,13 @@ Add the printed address to `../.env.local`:
 PROOF_GATED_ESCROW_ADDRESS=0x...
 ```
 
-### Step 5 — create deal and deposit
+### Step 5 — get USDC from faucet
+
+The deployer wallet needs USDC on Arc testnet before depositing. Get it from the [Arc faucet](https://faucet.arc.network) or the [ArcSend tool](https://arc-send.netlify.app).
+
+`setup.ts` uses 50 USDC (`50_000_000` at 6 decimals) — adjust `DEPOSIT_AMOUNT` in the script if your faucet gives a different amount.
+
+### Step 6 — create deal and deposit
 
 ```bash
 npx hardhat run scripts/setup.ts --network arc-testnet
@@ -93,11 +99,12 @@ npx hardhat run scripts/setup.ts --network arc-testnet
 
 Output:
 ```
-Deal created
-DEAL_ID=1
+USDC balance: 50000000
+Deal created. DEAL_ID=1
+Deposited 50000000 USDC into deal 1
 ```
 
-The escrow now holds 50,000 USDC (50k × 10^6) locked against deal 1, waiting for `onReport` from the MockKeystoneForwarder.
+The escrow now holds 50 USDC locked against deal 1, waiting for `onReport` from the MockKeystoneForwarder.
 
 ## Contract addresses (Arc testnet)
 
