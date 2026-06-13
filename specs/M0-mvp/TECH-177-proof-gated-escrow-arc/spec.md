@@ -1,4 +1,4 @@
-# ProofEscrow on Arc
+# ProofGatedEscrow on Arc
 
 ## Overview
 
@@ -56,61 +56,52 @@ flowchart TD
 
 ```
 contracts/
-├── package.json            ← Hardhat project dependencies and scripts
-├── tsconfig.json           ← TypeScript config for Hardhat and tests
-├── hardhat.config.ts       ← default Hardhat network only
-├── ProofEscrow.sol         ← the escrow contract
+├── foundry.toml                          ← Foundry config (src, test, solc version)
+├── hardhat.config.ts                     ← Hardhat for deployment only
+├── package.json                          ← deps; `npm test` runs `forge test`
+├── contracts/
+│   └── ProofGatedEscrow.sol             ← the escrow contract
 └── test/
-    ├── MockForwarder.sol   ← configurable verify() stub for test control
-    └── ProofEscrow.test.ts ← 7 contract tests
+    ├── helpers/
+    │   └── ProofGatedEscrowMocks.sol    ← minimal MockERC20 + MockForwarder
+    └── ProofGatedEscrow/
+        └── ProofGatedEscrow.t.sol       ← 7 Foundry unit tests
 ```
 
 ---
 
 ## Action Items
 
-**[x] Scaffold Hardhat TypeScript project**
+**[x] Scaffold Foundry project**
 
-Implement: Create `contracts/package.json` with Hardhat, ethers, and TypeScript test dependencies; `contracts/tsconfig.json`; `contracts/hardhat.config.ts` with the default in-process Hardhat network only.
+Implement: Create `contracts/foundry.toml` with `src = "contracts"`, `test = "test"`, `solc = "0.8.24"`, OZ remapping; install `forge-std`; update `package.json` with `@nomicfoundation/hardhat-foundry` and `test` script pointing to `forge test`.
 
 Verify:
 ```bash
-cd contracts && npx hardhat compile
+cd contracts && forge test
 ```
-→ exits 0, "Compiled 0 Solidity files"
+→ exits 0
 
 ---
 
-**[x] ProofEscrow.sol**
+**[x] ProofGatedEscrow.sol**
 
-Implement: Create `contracts/ProofEscrow.sol` with a state enum (`AWAITING_DEPOSIT`, `FUNDED`, `RELEASED`, `REJECTED`); constructor taking `usdc address`, `forwarder address`, `recipient address`, `scoreThreshold uint256`; `depositUSDC(uint256 amount)` — requires state `AWAITING_DEPOSIT`, calls `IERC20.transferFrom`, transitions to `FUNDED`, emits `Funded(address depositor, uint256 amount)`; `submitProof(bool compliant, uint256 score, bytes calldata sig)` — requires state `FUNDED`, calls `IKeystoneForwarder(forwarder).verify(abi.encode(compliant, score, sig))` and reverts on false, calls `_checkPolicy(compliant, score)` then either `_release()` (transitions to `RELEASED`, transfers USDC to recipient, emits `Released`) or `_reject(string reason)` (transitions to `REJECTED`, emits `Rejected`).
-
-Verify:
-```bash
-cd contracts && npx hardhat compile
-```
-→ exits 0, "Compiled 1 Solidity file successfully"
-
----
-
-**[x] MockForwarder.sol**
-
-Implement: Create `contracts/test/MockForwarder.sol` with a `constructor(bool _result)` and a `verify(bytes calldata) external view returns (bool)` that returns the constructor value — lets each test independently control whether signature verification passes or fails.
+Implement: Create `contracts/contracts/ProofGatedEscrow.sol` with a state enum (`AWAITING_DEPOSIT`, `FUNDED`, `RELEASED`, `REJECTED`); constructor taking `usdc address`, `forwarder address`, `recipient address`, `scoreThreshold uint256`; `depositUSDC(uint256 amount)` — requires state `AWAITING_DEPOSIT`, calls `IERC20.transferFrom`, transitions to `FUNDED`, emits `Funded`; `submitProof(bool compliant, uint256 score, bytes calldata sig)` — requires state `FUNDED`, calls `IKeystoneForwarder.verify`, checks policy, either releases USDC to recipient (emits `Released`) or locks with reason (emits `Rejected`).
 
 Verify:
 ```bash
-cd contracts && npx hardhat compile
+cd contracts && forge build
 ```
-→ exits 0, "Compiled 2 Solidity files successfully"
+→ exits 0
 
 ---
 
 **[x] Unit tests**
 
-Implement: Create `contracts/test/ProofEscrow.test.ts` covering all `ProofEscrow` contract functions per `specs/TECH-177-proof-escrow-arc/test.md`.
+Implement: Create `contracts/test/ProofGatedEscrow/ProofGatedEscrow.t.sol` and `contracts/test/helpers/ProofGatedEscrowMocks.sol` covering all contract functions per `specs/M0-minimum-viable/TECH-177-proof-gated-escrow-arc/test.md`.
 
 Verify:
+```bash
+cd contracts && forge test
 ```
-cd contracts && npx hardhat test
-```
-→ all pass, none skipped
+→ 7 passed, 0 failed

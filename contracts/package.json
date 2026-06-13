@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "compile": "hardhat compile",
-    "test": "hardhat test"
+    "test": "forge test"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@nomicfoundation/hardhat-foundry": "^1.1.0",
     "hardhat": "^2.22.0",
     "ts-node": "^10.9.0",
     "typescript": "^5.0.0"
