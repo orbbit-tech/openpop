@@ -95,7 +95,7 @@ npx hardhat verify --network arc-testnet <PROOF_GATED_ESCROW_ADDRESS> \
 
 ### Step 5 — get USDC from faucet
 
-The deployer wallet needs USDC on Arc testnet before depositing. Get it from the [Arc faucet](https://faucet.arc.network) or the [ArcSend tool](https://arc-send.netlify.app).
+The deployer wallet needs USDC on Arc testnet before depositing. Get it from the [Circle faucet](https://faucet.circle.com).
 
 `setup.ts` deposits 5 USDC (`5_000_000` at 6 decimals) — adjust `DEPOSIT_AMOUNT` in the script if needed.
 
