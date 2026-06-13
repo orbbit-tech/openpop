@@ -5,3 +5,4 @@ receipt.json
 .wallet-state.json
 node_modules/
 dist/
+memory/
