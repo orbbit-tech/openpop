@@ -13,7 +13,7 @@ async function main() {
   const escrow = await Escrow.deploy(usdcAddress, MOCK_KEYSTONE_FORWARDER)
   await escrow.waitForDeployment()
 
-  console.log(`PROOF_ESCROW_ADDRESS=${await escrow.getAddress()}`)
+  console.log(`PROOF_GATED_ESCROW_ADDRESS=${await escrow.getAddress()}`)
 }
 
 main().catch((err) => {

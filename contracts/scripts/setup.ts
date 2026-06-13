@@ -3,10 +3,10 @@ import { ethers } from 'hardhat'
 const DEPOSIT_AMOUNT = 50_000_000_000n // 50k USDC at 6 decimals
 
 async function main() {
-  const escrowAddress = process.env.PROOF_ESCROW_ADDRESS
+  const escrowAddress = process.env.PROOF_GATED_ESCROW_ADDRESS
   const recipientAddress = process.env.RECIPIENT_ADDRESS
   const usdcAddress = process.env.USDC_ADDRESS
-  if (!escrowAddress) throw new Error('PROOF_ESCROW_ADDRESS not set')
+  if (!escrowAddress) throw new Error('PROOF_GATED_ESCROW_ADDRESS not set')
   if (!recipientAddress) throw new Error('RECIPIENT_ADDRESS not set')
   if (!usdcAddress) throw new Error('USDC_ADDRESS not set')
 
