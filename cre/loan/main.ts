@@ -1,4 +1,5 @@
-import { HTTPCapability, handler, Runner, type Runtime, type HTTPPayload } from "@chainlink/cre-sdk"
+import { HTTPCapability, EVMClientCapability, handler, Runner, type Runtime, type HTTPPayload } from "@chainlink/cre-sdk"
+import { encodeAbiParameters, parseAbiParameters } from "viem"
 import { type Config, type InvoiceRequest } from "./types"
 import { runCompliance } from "./steps/compliance"
 import { getDairyCommodityPrice } from "./steps/dairy-commodity-price"
@@ -23,6 +24,22 @@ const onInvoiceSubmitted = (runtime: Runtime<Config>, triggerEvent: HTTPPayload)
   // Step 3 — Score the deal using compliance verdict and live commodity price.
   const underwriting = runUnderwriting(runtime, { businessName, invoiceId, amount, dairyPriceUsdPerLb: dairyPrice.price })
 
+  // Step 4 — Encode verdict and write proof on-chain via the Chainlink forwarder.
+  const evmClient = new EVMClientCapability()
+  const encoded = encodeAbiParameters(
+    parseAbiParameters("uint256,bool"),
+    [BigInt(config.dealId), underwriting.approved]
+  )
+  const signedReport = runtime.report(encoded)
+  const txResult = evmClient
+    .writeReport(runtime, {
+      toAddress: config.consumerAddress,
+      chainSelectorName: config.chainSelectorName,
+      report: signedReport,
+      gasLimit: 500000n,
+    })
+    .result()
+
   return JSON.stringify({
     invoiceId,
     businessName,
@@ -30,6 +47,7 @@ const onInvoiceSubmitted = (runtime: Runtime<Config>, triggerEvent: HTTPPayload)
     dairyPrice,
     underwriting,
     verdict: underwriting.approved ? "approved" : "rejected",
+    txHash: txResult.txHash,
     /*
      * runtime.now() is required here — Date.now() is non-deterministic across CRE nodes
      * and would cause consensus to fail.
