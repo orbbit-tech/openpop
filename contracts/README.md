@@ -59,7 +59,7 @@ Create `../.env.local` from the root `.env.example` and fill in:
 
 ```
 USDC_ADDRESS=0x3600000000000000000000000000000000000000   # Arc testnet USDC system contract
-RECIPIENT_ADDRESS=0xYourSMBWallet                         # receives USDC on approval
+RECIPIENT_ADDRESS=0xRecipientWallet                         # receives USDC on approval
 ```
 
 ### Step 3 — compile
@@ -71,7 +71,7 @@ npx hardhat compile
 ### Step 4 — deploy
 
 ```bash
-npx hardhat run scripts/deploy.ts --network arc
+npx hardhat run scripts/deploy.ts --network arc-testnet
 ```
 
 Output:
@@ -88,7 +88,7 @@ PROOF_GATED_ESCROW_ADDRESS=0x...
 ### Step 5 — create deal and deposit
 
 ```bash
-npx hardhat run scripts/setup.ts --network arc
+npx hardhat run scripts/setup.ts --network arc-testnet
 ```
 
 Output:
