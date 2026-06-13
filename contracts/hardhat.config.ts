@@ -14,7 +14,7 @@ dotenv.config({ path: path.resolve(__dirname, "../.env.local") });
 // Set it once with: npx hardhat keystore set DEPLOYER_PRIVATE_KEY
 export default defineConfig({
   plugins: [hardhatFoundry, hardhatEthers, hardhatKeystore],
-  solidity: "0.8.24",
+  solidity: { version: "0.8.24", settings: { evmVersion: "cancun" } },
   paths: {
     sources: "src",
     cache: "cache_hardhat",
