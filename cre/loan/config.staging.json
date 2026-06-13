@@ -1,9 +1,12 @@
 {
-  "complianceApiUrl": "COMPLIANCE_API_URL_HERE",
-  "underwritingApiUrl": "UNDERWRITING_API_URL_HERE",
+  "complianceApiUrl": "http://localhost:8787/compliance",
+  "underwritingApiUrl": "http://localhost:8787/underwriting",
   "complianceApiKeyOwner": "DYNAMIC_SERVER_WALLET_ADDRESS_HERE",
   "underwritingApiKeyOwner": "DYNAMIC_SERVER_WALLET_ADDRESS_HERE",
   "dairyPriceMockUsdPerLb": 2.13,
   "defaultBusinessName": "SMB",
-  "authorizedKeys": []
+  "authorizedKeys": [],
+  "consumerAddress": "PROOF_ESCROW_ADDRESS_HERE",
+  "dealId": 1,
+  "chainSelectorName": "arc-testnet"
 }

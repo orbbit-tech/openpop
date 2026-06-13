@@ -5,6 +5,9 @@ export type Config = {
   underwritingApiKeyOwner: string
   dairyPriceMockUsdPerLb: number
   defaultBusinessName: string
+  consumerAddress: string
+  dealId: number
+  chainSelectorName: string
 }
 
 export type InvoiceRequest = {
