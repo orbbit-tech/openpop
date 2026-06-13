@@ -89,7 +89,7 @@ PROOF_GATED_ESCROW_ADDRESS=0x...
 
 The deployer wallet needs USDC on Arc testnet before depositing. Get it from the [Arc faucet](https://faucet.arc.network) or the [ArcSend tool](https://arc-send.netlify.app).
 
-`setup.ts` uses 50 USDC (`50_000_000` at 6 decimals) — adjust `DEPOSIT_AMOUNT` in the script if your faucet gives a different amount.
+`setup.ts` deposits 5 USDC (`5_000_000` at 6 decimals) — adjust `DEPOSIT_AMOUNT` in the script if needed.
 
 ### Step 6 — create deal and deposit
 
@@ -99,12 +99,12 @@ npx hardhat run scripts/setup.ts --network arc-testnet
 
 Output:
 ```
-USDC balance: 50000000
+USDC balance: 5000000
 Deal created. DEAL_ID=1
-Deposited 50000000 USDC into deal 1
+Deposited 5000000 USDC into deal 1
 ```
 
-The escrow now holds 50 USDC locked against deal 1, waiting for `onReport` from the MockKeystoneForwarder.
+The escrow now holds 5 USDC locked against deal 1, waiting for `onReport` from the MockKeystoneForwarder.
 
 ## Contract addresses (Arc testnet)
 

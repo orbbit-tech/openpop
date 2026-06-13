@@ -1,6 +1,6 @@
 import hre from 'hardhat'
 
-const DEPOSIT_AMOUNT = 50_000_000n // 50 USDC at 6 decimals — get this from Arc faucet first
+const DEPOSIT_AMOUNT = 5_000_000n // 5 USDC at 6 decimals — get this from Arc faucet first
 
 const ERC20_ABI = [
   'function approve(address spender, uint256 amount) returns (bool)',
