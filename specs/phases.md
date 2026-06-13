@@ -8,75 +8,36 @@ Each scope carries its own `spec.md` and `test.md`.
 
 ---
 
-## Execution Map
+## Implementation Plan
 
 ```mermaid
 flowchart LR
-    00["00 · Setup"] --> 01["01 · UI Shell"]
-    00 --> 02["02 · CRE Workflow"]
-    00 --> 03["03 · Smart Contract"]
-    00 --> 04["04 · Dynamic Wallet"]
-    02 --> 05["05 · Orchestration"]
-    03 --> 05
-    04 --> 05
-    01 --> 06["06 · Integration"]
-    05 --> 06
-    06 --> 07["07 · Deploy"]
+    01["01 · UI Shell"]
+    02a["02-A · CRE Workflow"]
+    02b["02-B · Smart Contract"]
+    02c["02-C · Dynamic Wallet"]
+    01 --> 04["04 · Integration"]
+    02a --> 03["03 · Orchestration"]
+    02b --> 03
+    02c --> 03
+    03 --> 04
+    04 --> 05["05 · Deploy"]
 ```
 
-**Parallel:** `01`, `02`, `03`, `04` all branch from `00` — four worktrees running simultaneously.
-**Sequential:** `05` needs all three backend layers done; `06` wires UI to live data; `07` ships.
+**Parallel:** `01`, `02-A`, `02-B`, `02-C` all branch from `main` — four worktrees running simultaneously. Each scaffolds its own directory on first commit.
+**Sequential:** `03 · Orchestration` needs all three sponsor tech layers done; `04 · Integration` wires the UI shell to the live receipt; `05` ships.
 
 | Layer | Phases included |
 |---|---|
-| **L0** | 00 → 01 + 02 + 03 + 04 → 05 → 06 → 07 |
-| **L1** | Add Dynamic Flow widget to `04` (only after L0 deployed) |
-| **L2** | Swap underwriting in `02` for real Confidential AI Attester call (booth credentials only) |
-
----
-
-## L0 · Setup
-
-Shared foundation. Everyone unblocked before splitting into worktrees.
-
-```
-hackathons/openpop/
-├── pnpm-workspace.yaml
-├── .env.example          ← Arc RPC, Dynamic API key, dairy API key, CRE target
-├── apps/
-│   └── demo-ui/          ← Next.js scaffold only
-└── cre/                  ← CRE workflow scaffold only
-```
-
-**Shared types (defined here, imported everywhere):**
-```ts
-// types/receipt.ts
-type Receipt = {
-  compliant: boolean
-  score: number
-  approved: boolean
-  dairyPrice: number
-  txHash: string
-  signature: string
-  timestamp: string
-}
-```
-
-**Mock data fixtures:**
-```
-mock-data/
-├── invoice.json     ← Gallivant Ice Cream $50k dairy supply invoice to Walmart
-├── identity.json    ← Sneehee's fake KYC/KYB docs
-└── financials.json  ← mock bank statements for an ice cream SMB
-```
-
-**Done when:** `pnpm install` exits 0; receipt type compiles; mock JSON validates against Zod schemas.
+| **L0** | 01 + 02-A + 02-B + 02-C → 03 → 04 → 05 |
+| **L1** | Add Dynamic Flow widget to `02-C` (only after L0 deployed) |
+| **L2** | Swap underwriting in `02-A` for real Confidential AI Attester call (booth credentials only) |
 
 ---
 
 ## 01 · UI Shell `[parallel worktree A — start first]`
 
-Static Next.js demo. Hardcoded mock receipt — zero real backend. Demoable on day 1. This is what judges see first. Build this before anything else has API data.
+Static Next.js demo. Hardcoded mock receipt — zero real backend. Demoable on day 1. This is what judges see first. Build this before anything else has API data. Scaffolds `apps/demo-ui/` and `.env.example` — no shared setup step needed.
 
 ```
 apps/demo-ui/src/
@@ -90,11 +51,18 @@ apps/demo-ui/src/
     └── McpSnippet.tsx     ← static get_proof tool definition + install instructions
 ```
 
-**Done when:** `pnpm dev` opens in browser; both pages render with hardcoded data; no console errors. Screenshot-worthy on day 1.
+**Also creates:**
+```
+apps/demo-ui/src/types/receipt.ts   ← Receipt type (shared via copy-paste into cre/ when needed)
+apps/demo-ui/src/lib/fixtures.ts    ← hardcoded mock receipt for static render
+.env.example                        ← Arc RPC, Dynamic API key, dairy API key, CRE target
+```
+
+**Done when:** `npm run dev` opens in browser; both pages render with hardcoded data; no console errors. Screenshot-worthy on day 1.
 
 ---
 
-## 02 · CRE Workflow `[parallel worktree B]`
+## 02-A · CRE Workflow `[parallel worktree B — Sponsor Tech]`
 
 One Chainlink CRE workflow. Three sequential steps — compliance (mocked), dairy price fetch via x402, underwriting (mocked). One signed receipt out via `--broadcast`.
 
@@ -133,7 +101,7 @@ cre workflow simulate --broadcast --target staging-settings
 
 ---
 
-## 03 · Smart Contract `[parallel worktree C]`
+## 02-B · Smart Contract `[parallel worktree C — Sponsor Tech]`
 
 Arc escrow contract. Holds USDC, verifies CRE receipt via MockKeystoneForwarder, releases or locks.
 
@@ -164,7 +132,7 @@ npx hardhat deploy --network arc-testnet
 
 ---
 
-## 04 · Dynamic Wallet `[parallel worktree D]`
+## 02-C · Dynamic Wallet `[parallel worktree D — Sponsor Tech]`
 
 Server wallet that signs `submitProof()` and x402 payment. L1 adds Flow widget for investor deposit.
 
@@ -175,15 +143,15 @@ apps/demo-ui/src/lib/
     └── flowConfig()     ← [L1 only] Dynamic Flow: investor USDC deposit into Arc escrow
 ```
 
-**Done when:** server wallet signs a test tx to the deployed contract address from `03`; x402 payment to dairy API succeeds.
+**Done when:** server wallet signs a test tx to the deployed contract address from `02-B`; x402 payment to dairy API succeeds.
 
 **L1 addition:** Flow widget renders on `/invest` page; investor deposit appears in Arc escrow balance.
 
 ---
 
-## 05 · Orchestration `[sequential — needs 02 + 03 + 04]`
+## 03 · Orchestration `[sequential — needs 02-A + 02-B + 02-C]`
 
-Wire the three backend layers. Run the full pipeline once, write `receipt.json`.
+Backend-only. Connect the three sponsor tech layers, run the full pipeline once, write `receipt.json`. No UI involved.
 
 ```
 scripts/
@@ -205,9 +173,9 @@ pnpm run pipeline
 
 ---
 
-## 06 · Integration `[sequential — wires 01 UI to 05 live data]`
+## 04 · Integration `[sequential — wires 01 UI shell to 03 live data]`
 
-Replace hardcoded mock data in the UI with real `receipt.json`. This is where the demo becomes live.
+UI-only. Swap every hardcoded fixture in the shell components for live reads from `receipt.json`. This is where the demo becomes live.
 
 - `PipelineSteps` reads step timestamps from `receipt.json` via `/api/receipt`
 - `ReceiptCard` renders real CRE receipt + real Arc tx link
@@ -218,13 +186,13 @@ Replace hardcoded mock data in the UI with real `receipt.json`. This is where th
 
 ---
 
-## 07 · Deploy
+## 05 · Deploy
 
 Everything that must be live for judges to interact.
 
 | What | Where | How |
 |---|---|---|
-| `ProofGatedEscrow.sol` | Arc testnet | already deployed in `03` |
+| `ProofGatedEscrow.sol` | Arc testnet | already deployed in `02-B` |
 | `cre simulate --broadcast` | Local (pre-run) | run once, commit `receipt.json` |
 | `demo-ui` + API routes + MCP server | Vercel | `vercel --prod` |
 | Dairy cream price API | AWS Lambda (already live) | no change needed |
@@ -259,7 +227,7 @@ Add investor deposit flow. One additional widget on `/invest`. One webhook endpo
 
 ## L2 — Confidential AI Attester `[booth credentials only]`
 
-Swap mocked underwriting (Step 3 in `02`) for a real `ConfidentialHTTPClient` LLM call. One-line change.
+Swap mocked underwriting (Step 3 in `02-A`) for a real `ConfidentialHTTPClient` LLM call. One-line change.
 
 ```ts
 // before (mocked)
