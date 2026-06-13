@@ -166,7 +166,7 @@ flowchart TD
 |---|---|---|
 | **Dairy cream price API** | FastAPI on AWS Lambda (already deployed) | Live USDA cream price data — paid via x402 |
 | **Language** | TypeScript | CRE workflow, MCP server, Next.js app |
-| **State** | `receipt.json` flat file | Written by CRE runner, read by MCP server and Next.js API routes |
+| **State** | `proof.json` flat file | Written by CRE runner, read by MCP server and Next.js API routes |
 | **Smart contracts** | Solidity | `ProofGatedEscrow` — holds USDC, verifies CRE signature, releases on proof |
 | **Frontend** | Next.js | OpenPop studio (pipeline + receipt) · investor panel (deposit + agent verdict) |
 
@@ -190,17 +190,17 @@ Upgrade path: swap `MockKeystoneForwarder` → real `KeystoneForwarder` if Chain
 
 ### L0 — Minimum viable (ship this first, demo is done when this works)
 
-**Goal:** one working end-to-end run locally, receipt.json written, Arc tx on-chain, MCP readable. Video recorded. Public Next.js URL showing pre-computed results.
+**Goal:** one working end-to-end run locally, proof.json written, Arc tx on-chain, MCP readable. Video recorded. Public Next.js URL showing pre-computed results.
 
 | Component | What | Status |
 |---|---|---|
 | CRE workflow | 3-step TypeScript handler: compliance → x402 fetch → underwriting | All 3 steps mocked except x402 HTTP call |
 | `cre simulate --broadcast` | Runs workflow, submits receipt to Arc via MockKeystoneForwarder | Real Arc testnet tx |
-| `receipt.json` | Written by CRE runner, contains result + simulated signature + Arc tx hash | Flat file, no DB |
+| `proof.json` | Written by CRE runner, contains result + simulated signature + Arc tx hash | Flat file, no DB |
 | `ProofGatedEscrow.sol` | Deployed on Arc testnet, verifies receipt, releases USDC | Real on-chain |
 | Dynamic Server Wallet | Signs `submitProof` tx + x402 payment | Real |
 | x402 dairy price fetch | Live call to Orbbit dairy API, paid via server wallet | Real |
-| MCP server | `get_proof` tool reads `receipt.json`, returns it | Deployed alongside Next.js |
+| MCP server | `get_proof` tool reads `proof.json`, returns it | Deployed alongside Next.js |
 | Aaron's agent | Claude Code connected to MCP, calls `get_proof`, verifies, returns verdict | Claude Code + MCP |
 | Next.js UI | OpenPop studio: 3 pipeline steps + receipt JSON + Arc tx link + agent verdict panel | Pre-computed data, static render |
 | Aaron pre-funded | USDC already in escrow before demo runs | Done manually once |
