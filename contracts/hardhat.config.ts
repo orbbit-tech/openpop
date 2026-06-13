@@ -1,14 +1,13 @@
-import { defineConfig, vars } from "hardhat/config";
-import "@nomicfoundation/hardhat-keystore";
 import "@nomicfoundation/hardhat-foundry";
+import { HardhatUserConfig, vars } from "hardhat/config";
 
-// DEPLOYER_PRIVATE_KEY lives in the encrypted keystore — never in .env.
-// Set it once with: npx hardhat keystore set DEPLOYER_PRIVATE_KEY
+// DEPLOYER_PRIVATE_KEY is stored in Hardhat's encrypted vars store — never in .env.
+// Set it once with: npx hardhat vars set DEPLOYER_PRIVATE_KEY
 const deployerKey = vars.has("DEPLOYER_PRIVATE_KEY")
   ? [vars.get("DEPLOYER_PRIVATE_KEY")]
   : [];
 
-export default defineConfig({
+const config: HardhatUserConfig = {
   solidity: "0.8.24",
   paths: {
     sources: "contracts",
@@ -21,4 +20,6 @@ export default defineConfig({
       accounts: deployerKey,
     },
   },
-});
+};
+
+export default config;
