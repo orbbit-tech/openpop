@@ -8,6 +8,7 @@ import { VerdictCard } from '@/components/human/VerdictCard'
 import { WorkflowCanvas } from '@/components/human/WorkflowCanvas'
 import { AttestationBar } from '@/components/human/AttestationBar'
 import { AgentSheet } from '@/components/agent/AgentSheet'
+import { InvestSheet } from '@/components/invest/InvestSheet'
 
 type WorkflowStatus = 'idle' | 'running' | 'done' | 'error'
 
@@ -27,6 +28,7 @@ function statusColor(status: WorkflowStatus): string {
 
 export default function Home() {
   const [sheetOpen, setSheetOpen] = useState<boolean>(false)
+  const [investSheetOpen, setInvestSheetOpen] = useState<boolean>(false)
   const [status, setStatus] = useState<WorkflowStatus>('idle')
   const [liveProof, setLiveProof] = useState<Proof | null>(null)
 
@@ -47,7 +49,7 @@ export default function Home() {
 
   return (
     <>
-      <Nav onOpen={() => setSheetOpen(true)} txHash={proof.txHash} />
+      <Nav onOpen={() => setSheetOpen(true)} txHash={proof.txHash} onInvest={() => setInvestSheetOpen(true)} />
       <div
         style={{
           maxWidth: 820,
@@ -105,6 +107,10 @@ export default function Home() {
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
         proof={proof}
+      />
+      <InvestSheet
+        open={investSheetOpen}
+        onClose={() => setInvestSheetOpen(false)}
       />
     </>
   )
