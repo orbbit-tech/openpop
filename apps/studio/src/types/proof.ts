@@ -13,4 +13,7 @@ export type Proof = {
   consensus: { agreed: number; total: number }
   blockNumber: number
   steps: { label: string; status: 'completed' | 'pending' | 'failed'; metadata?: string }[]
+  // Zone 2 — decoded from Arc testnet receipt
+  usdcReleasedAmount?: number  // raw units (6 decimals): 5000000 = $5 USDC
+  recipient?: string           // wallet that received the USDC release
 }
