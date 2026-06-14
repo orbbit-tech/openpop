@@ -50,11 +50,6 @@ function CREGroupNodeComponent({ data }: NodeProps) {
         >
           CRE · TEE
         </div>
-        {d.execShort && (
-          <span style={{ fontSize: 8, color: 'hsla(180, 85%, 32%, 0.5)', fontFamily: 'monospace' }}>
-            {d.execShort}
-          </span>
-        )}
       </div>
     </div>
   )
@@ -64,7 +59,7 @@ const CREGroupNode = memo(CREGroupNodeComponent)
 
 // Minimal zone boundary — separates off-chain from on-chain
 function ZoneBoundaryNodeComponent({ data }: NodeProps) {
-  const d = data as { consensus: string; txShort: string }
+  const d = data as { consensus: string }
   return (
     <div style={{ width: 380, position: 'relative' }}>
       <Handle type="target" position={Position.Top} style={{ opacity: 0, pointerEvents: 'none' }} />
@@ -98,20 +93,6 @@ function ZoneBoundaryNodeComponent({ data }: NodeProps) {
           </span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-          <div
-            style={{
-              width: 1, height: 12,
-              background: 'var(--border-soft)',
-            }}
-          />
-          <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase' as const, color: 'var(--text-3)' }}>
-            Arc Testnet
-          </span>
-          <span style={{ fontSize: 9, color: 'var(--text-3)', fontFamily: 'monospace' }}>
-            {d.txShort}
-          </span>
-        </div>
       </div>
       <Handle type="source" position={Position.Bottom} style={{ opacity: 0, pointerEvents: 'none' }} />
     </div>
@@ -141,14 +122,6 @@ interface Props {
 export function WorkflowCanvas({ proof }: Props) {
   const txUrl = `${ARC_EXPLORER}/tx/${proof.txHash}`
 
-  const txShort = proof.txHash.startsWith('0x')
-    ? `${proof.txHash.slice(0, 8)}…${proof.txHash.slice(-4)}`
-    : proof.txHash
-
-  const execShort = proof.workflowExecutionId
-    ? `${proof.workflowExecutionId.slice(0, 8)}…${proof.workflowExecutionId.slice(-4)}`
-    : undefined
-
   // Correct group height: last step's bottom + bottom padding
   const groupH = GROUP_PAD_TOP + (proof.steps.length - 1) * GROUP_STEP_GAP + NODE_H + GROUP_PAD_BOT
 
@@ -174,7 +147,7 @@ export function WorkflowCanvas({ proof }: Props) {
       id: 'cre-group',
       type: 'creGroup',
       position: { x: 0, y: GROUP_Y },
-      data: { execShort },
+      data: {},
       style: { width: GROUP_W, height: groupH },
     },
     ...proof.steps.map((step, i) => ({
@@ -197,7 +170,6 @@ export function WorkflowCanvas({ proof }: Props) {
       position: { x: 0, y: BOUNDARY_Y },
       data: {
         consensus: `${proof.consensus.agreed}/${proof.consensus.total} nodes`,
-        txShort,
       },
     },
     {
@@ -223,7 +195,7 @@ export function WorkflowCanvas({ proof }: Props) {
       },
     },
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [proof, execShort, txUrl, txShort, groupH, GROUP_Y, BOUNDARY_Y, SIG_Y, USDC_Y])
+  ], [proof, txUrl, groupH, GROUP_Y, BOUNDARY_Y, SIG_Y, USDC_Y])
 
   const edges: Edge[] = useMemo(() => {
     const soft = { stroke: 'hsla(180, 85%, 32%, 0.28)', strokeWidth: 1.5 }
