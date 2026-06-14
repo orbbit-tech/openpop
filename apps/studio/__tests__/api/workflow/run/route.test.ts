@@ -161,7 +161,7 @@ describe('POST /api/workflow/run', () => {
     expect(vi.mocked(writeFileSync)).not.toHaveBeenCalled()
   })
 
-  it('[happy-path] x402 fetch returns price → dairyPriceUsdPerLb present in --http-payload passed to spawnSync', async () => {
+  it('trigger payload does not contain dairyPriceUsdPerLb', async () => {
     vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: makeCREStdout(creResult) } as any)
 
     await POST(makeRequest())
@@ -169,15 +169,6 @@ describe('POST /api/workflow/run', () => {
     const args = vi.mocked(spawnSync).mock.calls[0][1] as string[]
     const idx = args.indexOf('--http-payload')
     const payload = JSON.parse(args[idx + 1])
-    expect(payload.dairyPriceUsdPerLb).toBe(2.34)
-  })
-
-  it('[unhappy-path] x402 fetch throws → returns 500 and spawnSync is not called', async () => {
-    mockFetchWithPayment.mockRejectedValueOnce(new Error('network error'))
-
-    const res = await POST(makeRequest())
-
-    expect(res.status).toBe(500)
-    expect(vi.mocked(spawnSync)).not.toHaveBeenCalled()
+    expect(payload).not.toHaveProperty('dairyPriceUsdPerLb')
   })
 })
