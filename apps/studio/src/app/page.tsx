@@ -1,111 +1,113 @@
-'use client'
-
-import { useState } from 'react'
-import type { Proof } from '@/types/proof'
 import { MOCK_PROOF } from '@/lib/fixtures'
 import { Nav } from '@/components/Nav'
-import { VerdictCard } from '@/components/human/VerdictCard'
-import { WorkflowCanvas } from '@/components/human/WorkflowCanvas'
-import { AttestationBar } from '@/components/human/AttestationBar'
-import { AgentSheet } from '@/components/agent/AgentSheet'
 
-type WorkflowStatus = 'idle' | 'running' | 'done' | 'error'
-
-function statusLabel(status: WorkflowStatus): string {
-  if (status === 'idle') return 'Showing fixture data'
-  if (status === 'running') return 'Workflow running…'
-  if (status === 'done') return 'Live · workflow completed'
-  return 'Workflow failed — showing fixture'
-}
-
-function statusColor(status: WorkflowStatus): string {
-  if (status === 'idle') return 'hsl(215, 14%, 47%)'
-  if (status === 'running') return 'hsl(38, 92%, 55%)'
-  if (status === 'done') return 'hsl(142, 71%, 52%)'
-  return 'hsl(0, 72%, 51%)'
-}
-
-export default function Home() {
-  const [sheetOpen, setSheetOpen] = useState<boolean>(false)
-  const [status, setStatus] = useState<WorkflowStatus>('idle')
-  const [liveProof, setLiveProof] = useState<Proof | null>(null)
-
-  const proof = liveProof ?? MOCK_PROOF
-
-  async function runWorkflow() {
-    setStatus('running')
-    try {
-      const res = await fetch('/api/workflow/run', { method: 'POST' })
-      if (!res.ok) throw new Error(String(res.status))
-      const data: Proof = await res.json()
-      setLiveProof(data)
-      setStatus('done')
-    } catch {
-      setStatus('error')
-    }
-  }
+export default function DealsPage() {
+  const deals = [MOCK_PROOF]
 
   return (
     <>
-      <Nav onOpen={() => setSheetOpen(true)} txHash={proof.txHash} />
+      <Nav />
       <div
         style={{
           maxWidth: 820,
           margin: '0 auto',
           padding: '32px 24px 64px',
           display: 'flex',
-          flexDirection: 'column' as const,
-          gap: 10,
+          flexDirection: 'column',
+          gap: 16,
         }}
       >
-        {/* Run Workflow row */}
-        <div
+        <h1
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 12,
-            marginBottom: 2,
+            fontSize: 14,
+            fontWeight: 700,
+            color: 'var(--text-1)',
+            letterSpacing: '-0.02em',
+            margin: 0,
           }}
         >
-          <button
-            onClick={runWorkflow}
-            disabled={status === 'running'}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              height: 30,
-              padding: '0 12px',
-              borderRadius: 4,
-              fontSize: 12,
-              fontWeight: 600,
-              fontFamily: 'inherit',
-              cursor: status === 'running' ? 'not-allowed' : 'pointer',
-              border: status === 'running' ? '1px solid var(--border-soft)' : '1px solid var(--teal)',
-              background: status === 'running' ? 'var(--surface)' : 'var(--teal)',
-              color: status === 'running' ? 'var(--text-3)' : '#fff',
-            }}
-          >
-            Run Workflow
-          </button>
-          <span
-            style={{
-              fontSize: 11,
-              color: statusColor(status),
-            }}
-          >
-            {statusLabel(status)}
-          </span>
-        </div>
+          Verified Deals
+        </h1>
 
-        <VerdictCard proof={proof} />
-        <WorkflowCanvas proof={proof} />
-        <AttestationBar proof={proof} />
+        <div
+          style={{
+            background: 'var(--surface)',
+            border: '1px solid var(--border-soft)',
+            borderRadius: 'var(--radius-lg)',
+            overflow: 'hidden',
+          }}
+        >
+          {/* Header row */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 100px 100px 110px 28px',
+              padding: '8px 16px',
+              borderBottom: '1px solid var(--border-soft)',
+              gap: 12,
+            }}
+          >
+            {['Company', 'Score', 'Verdict', 'Date', ''].map((h) => (
+              <span
+                key={h}
+                style={{
+                  fontSize: 9,
+                  fontWeight: 700,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  color: 'var(--text-3)',
+                }}
+              >
+                {h}
+              </span>
+            ))}
+          </div>
+
+          {/* Deal rows */}
+          {deals.map((deal, i) => (
+            <a
+              key={i}
+              href="/deals/gallivant-001"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 100px 100px 110px 28px',
+                padding: '12px 16px',
+                gap: 12,
+                alignItems: 'center',
+                textDecoration: 'none',
+                borderBottom: i < deals.length - 1 ? '1px solid var(--border-soft)' : undefined,
+              }}
+            >
+              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-1)' }}>
+                {deal.companyName}
+              </span>
+              <span style={{ fontSize: 13, color: 'var(--text-2)' }}>
+                {deal.score}/100
+              </span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  height: 20,
+                  padding: '0 8px',
+                  borderRadius: 100,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  background: deal.approved ? 'hsl(142, 71%, 92%)' : 'hsl(0, 72%, 92%)',
+                  color: deal.approved ? 'hsl(142, 71%, 30%)' : 'hsl(0, 72%, 40%)',
+                  width: 'fit-content',
+                }}
+              >
+                {deal.approved ? 'Approved' : 'Rejected'}
+              </span>
+              <span style={{ fontSize: 12, color: 'var(--text-3)', fontFamily: 'monospace' }}>
+                {deal.timestamp.slice(0, 10)}
+              </span>
+              <span style={{ fontSize: 14, color: 'var(--text-3)' }}>→</span>
+            </a>
+          ))}
+        </div>
       </div>
-      <AgentSheet
-        open={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        proof={proof}
-      />
     </>
   )
 }
