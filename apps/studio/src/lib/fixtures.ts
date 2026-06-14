@@ -13,9 +13,15 @@ export const MOCK_PROOF: Proof = {
   timestamp: '2026-06-13T23:21:50.667Z',
   prover: 'CRE / BFT Consensus',
   consensus: { agreed: 7, total: 9 },
-  blockNumber: 47005738,
+  blockNumber: 46946346,
+  // Zone 2 — decoded from Arc testnet receipt (live-hydrated on page load via fetchArcReceipt)
   usdcReleasedAmount: 5000000,
   recipient: '0xbc10268a5ca8287bbad5aaf4667c056f35412ea4',
+  dealId: 1,
+  workflowExecutionId: '0x99b840d91a94ec080e4c76ce95c67eba1c63d26a6c950cba12116d21765beba5',
+  reportId: '0x0001',
+  escrowAddress: '0x6adeb480bb7b7c54be7fb80b56e7cd23fbd30527',
+  forwarderAddress: '0x6e9ee680ef59ef64aa8c7371279c27e496b5edc1',
   steps: [
     {
       label: 'Compliance Check',
