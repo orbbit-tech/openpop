@@ -11,3 +11,4 @@ contracts/out/
 .env.local
 .env
 memory/
+sponsor-criteria.md
