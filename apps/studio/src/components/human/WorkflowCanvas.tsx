@@ -37,18 +37,17 @@ function CREGroupNodeComponent({ data }: NodeProps) {
       >
         <div
           style={{
-            padding: '2px 7px',
-            background: 'hsla(180, 85%, 32%, 0.07)',
-            border: '1px solid hsla(180, 85%, 32%, 0.2)',
+            padding: '2px 8px',
+            background: 'hsl(28, 90%, 96%)',
+            border: '1px solid hsl(28, 75%, 80%)',
             borderRadius: 4,
             fontSize: 8,
-            fontWeight: 700,
-            letterSpacing: '0.1em',
-            textTransform: 'uppercase' as const,
-            color: 'var(--teal)',
+            fontWeight: 600,
+            letterSpacing: '0.02em',
+            color: 'hsl(28, 75%, 42%)',
           }}
         >
-          CRE · TEE
+          Verified Execution Environment
         </div>
       </div>
     </div>
@@ -158,7 +157,9 @@ export function WorkflowCanvas({ proof }: Props) {
       position: { x: GROUP_W / 2, y: GROUP_PAD_TOP + i * GROUP_STEP_GAP },
       data: {
         label: step.label,
-        badge: step.status === 'completed' ? 'Attested' : step.status === 'failed' ? 'Failed' : 'Pending',
+        badge: step.status === 'completed'
+            ? (step.badge ?? 'Attested')
+            : step.status === 'failed' ? 'Failed' : 'Pending',
         status: step.status,
         // no href — CRE steps don't have individual on-chain records; all 3 share one report
       },

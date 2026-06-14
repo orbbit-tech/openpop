@@ -97,8 +97,8 @@ function ProofNodeComponent({ data }: NodeProps) {
             <div
               style={{
                 background: badgeBg, border: `1px solid ${badgeBorder}`, borderRadius: 100,
-                padding: '2px 7px', fontSize: 8, fontWeight: 700,
-                letterSpacing: '0.07em', textTransform: 'uppercase' as const, color: badgeColor,
+                padding: '2px 7px', fontSize: 10, fontWeight: 600,
+                letterSpacing: '0.03em', textTransform: 'uppercase' as const, color: badgeColor,
               }}
             >
               {d.badge}
