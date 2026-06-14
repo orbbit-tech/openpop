@@ -1,13 +1,13 @@
 const ARC_EXPLORER = 'https://testnet.arcscan.app'
 
 interface NavProps {
-  onOpen: () => void
-  txHash: string
+  onOpen?: () => void
+  txHash?: string
   onInvest?: () => void
 }
 
 export function Nav({ onOpen, txHash, onInvest }: NavProps) {
-  const explorerUrl = `${ARC_EXPLORER}/tx/${txHash}`
+  const explorerUrl = txHash ? `${ARC_EXPLORER}/tx/${txHash}` : undefined
   return (
     <nav
       style={{
@@ -25,30 +25,46 @@ export function Nav({ onOpen, txHash, onInvest }: NavProps) {
         height: 52,
       }}
     >
-      {/* Left: logo + proof ID */}
+      {/* Left: logo + Deals link */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <a href="#" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
+        <a href="/" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/openpop-logo.svg" alt="OpenPop" style={{ height: 28, width: 'auto' }} />
         </a>
 
-        <span
+        <a
+          href="/"
           style={{
-            fontFamily: 'monospace',
-            fontSize: 11,
-            color: 'var(--text-3)',
-            padding: '3px 8px',
-            border: '1px solid var(--border-soft)',
-            borderRadius: 100,
-            background: 'var(--surface)',
+            fontSize: 12,
+            fontWeight: 500,
+            color: 'var(--text-2)',
+            textDecoration: 'none',
           }}
         >
-          proof / gallivant-001
-        </span>
+          Deals
+        </a>
       </div>
 
-      {/* Right: Invest button + For Agents button + on-chain link */}
+      {/* Right: environment badges + optional actions */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {[
+          { label: 'CRE Simulated' },
+          { label: 'Arc Testnet' },
+        ].map(({ label }) => (
+          <span key={label} style={{
+            padding: '2px 8px',
+            borderRadius: 100,
+            fontSize: 9,
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase' as const,
+            background: 'var(--accent-bg)',
+            border: '1px solid var(--border-soft)',
+            color: 'var(--text-3)',
+          }}>
+            {label}
+          </span>
+        ))}
         {onInvest && (
           <button
             onClick={onInvest}
@@ -72,49 +88,53 @@ export function Nav({ onOpen, txHash, onInvest }: NavProps) {
             Invest
           </button>
         )}
-        <button
-          onClick={onOpen}
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: 5,
-            height: 30,
-            padding: '0 12px',
-            borderRadius: 4,
-            fontSize: 12,
-            fontWeight: 500,
-            cursor: 'pointer',
-            border: '1px solid var(--border-soft)',
-            background: 'var(--surface)',
-            color: 'var(--text-2)',
-            fontFamily: 'inherit',
-            transition: 'color .12s, border-color .12s',
-          }}
-        >
-          For Agents
-        </button>
+        {onOpen && (
+          <button
+            onClick={onOpen}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              height: 30,
+              padding: '0 12px',
+              borderRadius: 4,
+              fontSize: 12,
+              fontWeight: 500,
+              cursor: 'pointer',
+              border: '1px solid var(--border-soft)',
+              background: 'var(--surface)',
+              color: 'var(--text-2)',
+              fontFamily: 'inherit',
+              transition: 'color .12s, border-color .12s',
+            }}
+          >
+            For Agents
+          </button>
+        )}
 
-        <a
-          href={explorerUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'inline-flex',
-            alignItems: 'center',
-            height: 30,
-            padding: '0 12px',
-            borderRadius: 4,
-            fontSize: 12,
-            fontWeight: 600,
-            cursor: 'pointer',
-            border: '1px solid var(--teal)',
-            background: 'var(--teal)',
-            color: '#fff',
-            textDecoration: 'none',
-          }}
-        >
-          View on-chain ↗
-        </a>
+        {txHash && explorerUrl && (
+          <a
+            href={explorerUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              height: 30,
+              padding: '0 12px',
+              borderRadius: 4,
+              fontSize: 12,
+              fontWeight: 600,
+              cursor: 'pointer',
+              border: '1px solid var(--teal)',
+              background: 'var(--teal)',
+              color: '#fff',
+              textDecoration: 'none',
+            }}
+          >
+            View on-chain ↗
+          </a>
+        )}
       </div>
     </nav>
   )
