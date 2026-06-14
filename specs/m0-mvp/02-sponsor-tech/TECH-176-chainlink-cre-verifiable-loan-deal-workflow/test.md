@@ -4,7 +4,7 @@
 
 **Run:**
 ```
-cd /Users/aphanmiz/Desktop/Orbbit/orbbit-codebase/hackathons/openpop-worktrees/TECH-176-cre-workflow/cre && PATH="$HOME/.cre/bin:$PATH" cre workflow simulate loan \
+cd /Users/aphanmiz/Desktop/Orbbit/orbbit-codebase/hackathons/openpop-worktrees/TECH-176-cre-workflow/cre && PATH="$HOME/.cre/bin:$PATH" cre workflow simulate invoice-financing \
   --non-interactive \
   --trigger-index 0 \
   --http-payload '{"invoiceId":"GALLIVANT-001","amount":50000,"applicantName":"Gallivant Ice Cream"}' \

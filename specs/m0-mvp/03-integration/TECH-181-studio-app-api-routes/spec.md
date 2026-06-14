@@ -21,7 +21,7 @@ Implementation — advances L0 from static fixture to live pipeline output. Veri
 ```mermaid
 flowchart LR
   subgraph RUN["POST /api/workflow/run"]
-    R1["spawnSync: cre workflow simulate --broadcast\ncwd → cre/loan/"]
+    R1["spawnSync: cre workflow simulate --broadcast\ncwd → cre/invoice-financing/"]
     R2{"exit 0?"}
     R3["Parse stdout → CREResult\ninvoiceId · compliance · dairyPrice · underwriting"]
     R4["Shape → Receipt\ncompliance.kyc → compliant\nunderwriting.score → score\ndairyPrice.price → dairyPrice\nmock sig · txHash · consensus · blockNumber · steps"]
@@ -92,7 +92,7 @@ specs/m0-mvp/TECH-181-api-routes-bff-layer/
 
 **[x] Create POST /api/workflow/run route handler**
 
-Implement: Create `apps/studio/src/app/api/workflow/run/route.ts` — POST handler that calls `spawnSync('cre', ['workflow', 'simulate', '--broadcast'], { cwd: path.join(process.cwd(), '../../cre/loan'), encoding: 'utf-8' })`, parses the stdout JSON into a `CREResult`, shapes it into the `Receipt` type (deriving `compliant` from compliance fields, `score` and `approved` from underwriting, `dairyPrice` from the price result, mock values for `signature`, `txHash`, `prover`, `consensus`, `blockNumber`, and step metadata strings), writes the receipt to `proof.json` at `process.cwd()`, and returns `NextResponse.json({ receipt })` with 200 on success or `NextResponse.json({ error }, { status: 500 })` on any failure.
+Implement: Create `apps/studio/src/app/api/workflow/run/route.ts` — POST handler that calls `spawnSync('cre', ['workflow', 'simulate', '--broadcast'], { cwd: path.join(process.cwd(), '../../cre/invoice-financing'), encoding: 'utf-8' })`, parses the stdout JSON into a `CREResult`, shapes it into the `Receipt` type (deriving `compliant` from compliance fields, `score` and `approved` from underwriting, `dairyPrice` from the price result, mock values for `signature`, `txHash`, `prover`, `consensus`, `blockNumber`, and step metadata strings), writes the receipt to `proof.json` at `process.cwd()`, and returns `NextResponse.json({ receipt })` with 200 on success or `NextResponse.json({ error }, { status: 500 })` on any failure.
 
 Verify:
 ```bash

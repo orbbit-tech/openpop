@@ -21,8 +21,8 @@ Advances **Underwriting** toward Zone 1. The underwriting score is currently com
 ```mermaid
 flowchart TD
     POST["POST /api/workflow/run"]
-    POST --> WALLET["Instantiate Base Sepolia wallet\nfrom X402_PRIVATE_KEY env var"]
-    WALLET --> FETCH["fetchWithPayment → DAIRY_API_URL"]
+    POST --> WALLET["Instantiate Base Sepolia wallet\nfrom DYNAMIC_WALLET_PASSWORD env var"]
+    WALLET --> FETCH["fetchWithPayment → DAIRY_PRICING_API_URL"]
 
     FETCH -->|"200 — no payment required"| PRICE
     FETCH -->|"402 Payment Required"| PAY["Pay USDC on Base Sepolia\nX-PAYMENT header attached"]
@@ -30,7 +30,7 @@ flowchart TD
     RETRY --> PRICE["dairyPrice · { price: number, unit: string }"]
 
     PRICE --> PAYLOAD["Build CRE trigger payload\n{ invoiceId, amount, businessName, dairyPriceUsdPerLb }"]
-    PAYLOAD --> CRE["spawnSync: cre workflow simulate loan\n--broadcast --http-payload payload"]
+    PAYLOAD --> CRE["spawnSync: cre workflow simulate invoice-financing\n--broadcast --http-payload payload"]
     CRE -->|"exit 0"| PARSE["Parse stdout → CREResult"]
     CRE -->|"exit non-0"| ERR500A["Return 500"]
     PARSE -->|"valid JSON"| PROOF["Shape CREResult → Proof\nWrite proof.json\nReturn 200"]
@@ -54,8 +54,8 @@ apps/studio/
   src/app/api/workflow/run/
     route.ts                                      ← fetch live dairy price via x402 before spawnSync; inject into payload
   __tests__/api/workflow/run/
-    route.test.ts                                 ← mock x402-fetch; stub X402_PRIVATE_KEY so existing tests pass
-.env.example                                      ← add DAIRY_API_URL and X402_PRIVATE_KEY
+    route.test.ts                                 ← mock x402-fetch; stub DYNAMIC_WALLET_PASSWORD so existing tests pass
+.env.example                                      ← add DAIRY_PRICING_API_URL and DYNAMIC_WALLET_PASSWORD
 specs/m2-x402/03-integration/
   TECH-187-wire-x402-dairy-price-fetch-into-cre-simulation/
     spec.md                                       ← this file
@@ -79,7 +79,7 @@ grep '"x402-fetch"' apps/studio/package.json && grep '"viem"' apps/studio/packag
 
 **[x] Fetch live dairy price via x402 in /api/workflow/run**
 
-Implement: Update `apps/studio/src/app/api/workflow/run/route.ts` — before `spawnSync`, create a Base Sepolia wallet client from `process.env.X402_PRIVATE_KEY`, wrap `fetch` with payment capability, call `process.env.DAIRY_API_URL`, and add `dairyPriceUsdPerLb: dairyPrice.price` to the trigger payload. If the fetch throws or the response is not ok, return 500 before calling `spawnSync`.
+Implement: Update `apps/studio/src/app/api/workflow/run/route.ts` — before `spawnSync`, create a Base Sepolia wallet client from `process.env.DYNAMIC_WALLET_PASSWORD`, wrap `fetch` with payment capability, call `process.env.DAIRY_PRICING_API_URL`, and add `dairyPriceUsdPerLb: dairyPrice.price` to the trigger payload. If the fetch throws or the response is not ok, return 500 before calling `spawnSync`.
 
 Verify:
 ```bash
@@ -92,7 +92,7 @@ grep -q 'dairyPriceUsdPerLb' apps/studio/src/app/api/workflow/run/route.ts
 
 **[x] Update workflow/run tests to mock x402-fetch**
 
-Implement: Update `apps/studio/__tests__/api/workflow/run/route.test.ts` — add `vi.mock('x402-fetch', ...)` returning a `wrapFetchWithPayment` stub that resolves `{ price: 2.34, unit: 'USD/lb' }`, and set `process.env.X402_PRIVATE_KEY` to a valid-format test private key so wallet instantiation does not throw. All existing test assertions must continue to pass.
+Implement: Update `apps/studio/__tests__/api/workflow/run/route.test.ts` — add `vi.mock('x402-fetch', ...)` returning a `wrapFetchWithPayment` stub that resolves `{ price: 2.34, unit: 'USD/lb' }`, and set `process.env.DYNAMIC_WALLET_PASSWORD` to a valid-format test private key so wallet instantiation does not throw. All existing test assertions must continue to pass.
 
 Verify:
 ```bash
@@ -102,12 +102,12 @@ cd apps/studio && npm test
 
 ---
 
-**[x] Document DAIRY_API_URL and X402_PRIVATE_KEY in .env.example**
+**[x] Document DAIRY_PRICING_API_URL and DYNAMIC_WALLET_PASSWORD in .env.example**
 
-Implement: In `.env.example`, update `DAIRY_API_URL` to `https://g78md4c7ke.execute-api.us-east-1.amazonaws.com/dairy/cream/price` and add `X402_PRIVATE_KEY=your-base-sepolia-eoa-private-key` under a new `── x402 payment wallet (Base Sepolia) ──` section with a comment explaining this EOA must hold testnet USDC to pay for dairy price API queries.
+Implement: In `.env.example`, update `DAIRY_PRICING_API_URL` to `https://g78md4c7ke.execute-api.us-east-1.amazonaws.com/dairy/cream/price` and add `DYNAMIC_WALLET_PASSWORD=your-base-sepolia-eoa-private-key` under a new `── x402 payment wallet (Base Sepolia) ──` section with a comment explaining this EOA must hold testnet USDC to pay for dairy price API queries.
 
 Verify:
 ```bash
-grep 'g78md4c7ke' .env.example && grep 'X402_PRIVATE_KEY' .env.example
+grep 'g78md4c7ke' .env.example && grep 'DYNAMIC_WALLET_PASSWORD' .env.example
 ```
 → both lines print, exits 0

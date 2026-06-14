@@ -48,7 +48,7 @@ flowchart TD
 
 ```
 cre/
-  loan/
+  invoice-financing/
     main.ts                 ← HTTP handler: 3 steps → receipt JSON
     package.json
     tsconfig.json
@@ -69,7 +69,7 @@ Implement: Run `cre init` to generate the `cre/` folder with a TypeScript starte
 
 Verify:
 ```
-ls cre/loan/main.ts cre/project.yaml cre/secrets.yaml
+ls cre/invoice-financing/main.ts cre/project.yaml cre/secrets.yaml
 ```
 → exits 0, all three files exist
 
@@ -77,11 +77,11 @@ ls cre/loan/main.ts cre/project.yaml cre/secrets.yaml
 
 **[ ] Install dependencies**
 
-Implement: Run `bun install` (and `bunx cre-setup` if it didn't run automatically) inside `cre/loan/`.
+Implement: Run `bun install` (and `bunx cre-setup` if it didn't run automatically) inside `cre/invoice-financing/`.
 
 Verify:
 ```
-ls cre/loan/node_modules/@chainlink/cre-sdk/package.json
+ls cre/invoice-financing/node_modules/@chainlink/cre-sdk/package.json
 ```
 → exits 0
 
@@ -89,11 +89,11 @@ ls cre/loan/node_modules/@chainlink/cre-sdk/package.json
 
 **[ ] Write the config files**
 
-Implement: Set `cre/loan/workflow.yaml` to use an HTTP trigger; write `cre/loan/config.staging.json` with the mock dairy price (`2.13`) and default applicant name; write minimal `cre/project.yaml`, empty `cre/secrets.yaml`, and `cre/.env.example` with a private key placeholder.
+Implement: Set `cre/invoice-financing/workflow.yaml` to use an HTTP trigger; write `cre/invoice-financing/config.staging.json` with the mock dairy price (`2.13`) and default applicant name; write minimal `cre/project.yaml`, empty `cre/secrets.yaml`, and `cre/.env.example` with a private key placeholder.
 
 Verify:
 ```
-python3 -c "import json; d=json.load(open('cre/loan/config.staging.json')); assert d['dairyPriceMockUsdPerLb'] == 2.13; print('ok')"
+python3 -c "import json; d=json.load(open('cre/invoice-financing/config.staging.json')); assert d['dairyPriceMockUsdPerLb'] == 2.13; print('ok')"
 ```
 → prints `ok`
 
@@ -101,7 +101,7 @@ python3 -c "import json; d=json.load(open('cre/loan/config.staging.json')); asse
 
 **[ ] Write the function that runs the three steps and returns the receipt**
 
-Implement: Replace `cre/loan/main.ts` with a function that receives the invoice request, runs the three hardcoded steps one by one, packages all the results into a receipt object, and returns it as a JSON string. Each step logs its name so it's visible in the simulation output.
+Implement: Replace `cre/invoice-financing/main.ts` with a function that receives the invoice request, runs the three hardcoded steps one by one, packages all the results into a receipt object, and returns it as a JSON string. Each step logs its name so it's visible in the simulation output.
 
 Verify:
 ```

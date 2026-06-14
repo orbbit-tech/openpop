@@ -59,8 +59,8 @@ The current `workflow/run/route.ts` shells out `cre simulate` directly — it as
 
 **Vercel** (set in dashboard):
 ```
-X402_PRIVATE_KEY=0x...              # Base Sepolia wallet for dairy price x402 payment
-DAIRY_API_URL=https://...           # Orbbit dairy cream price API
+DYNAMIC_WALLET_PASSWORD=0x...              # Base Sepolia wallet for dairy price x402 payment
+DAIRY_PRICING_API_URL=https://...           # Orbbit dairy cream price API
 CRE_RUNNER_URL=https://abc123.ngrok-free.app   # update each demo session
 ```
 
@@ -71,7 +71,7 @@ CRE_ETH_PRIVATE_KEY=0x...          # Arc testnet wallet for submitProof gas
 
 ### 2. Point CRE at Vercel for compliance + underwriting
 
-`cre/loan/config.staging.json`:
+`cre/invoice-financing/config.staging.json`:
 ```json
 {
   "complianceApiUrl": "https://your-app.vercel.app/api/compliance",

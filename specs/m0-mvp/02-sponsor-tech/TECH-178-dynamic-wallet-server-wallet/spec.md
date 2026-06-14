@@ -114,7 +114,7 @@ npx tsc --noEmit
 
 Implement: Orchestrator that executes the four steps in sequence:
 - initialises the wallet client via `getViemWalletClient` with Arc chain config from env
-- wraps `fetch` with x402 payment handler, calls `DAIRY_API_URL`, parses `{ price, unit }` as `dairyPrice`
+- wraps `fetch` with x402 payment handler, calls `DAIRY_PRICING_API_URL`, parses `{ price, unit }` as `dairyPrice`
 - runs `cre workflow simulate` via `execSync`, parses the JSON receipt from stdout as `creReceipt`
 - calls `ProofEscrow.submitProof(compliant, score, sig)` via `walletClient.writeContract` with the inline ABI fragment, using `"0x"` for `sig` (MockForwarder accepts any bytes), and captures `arcTxHash`
 - writes `receipt.json` with `{ dairyPrice, creReceipt, arcTxHash, walletAddress }`
@@ -129,7 +129,7 @@ npx tsc --noEmit
 
 **[x] Create .env.example**
 
-Implement: Write `.env.example` with seven entries: `DYNAMIC_AUTH_TOKEN`, `DYNAMIC_ENVIRONMENT_ID`, `DYNAMIC_WALLET_PASSWORD`, `ARC_RPC_URL`, `ARC_CHAIN_ID`, `PROOF_ESCROW_ADDRESS`, `DAIRY_API_URL` — each with a placeholder value.
+Implement: Write `.env.example` with seven entries: `DYNAMIC_AUTH_TOKEN`, `DYNAMIC_ENVIRONMENT_ID`, `DYNAMIC_WALLET_PASSWORD`, `ARC_RPC_URL`, `ARC_CHAIN_ID`, `PROOF_ESCROW_ADDRESS`, `DAIRY_PRICING_API_URL` — each with a placeholder value.
 
 Verify:
 ```bash

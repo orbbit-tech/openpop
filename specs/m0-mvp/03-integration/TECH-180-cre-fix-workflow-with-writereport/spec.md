@@ -50,7 +50,7 @@ flowchart LR
 ## File Tree
 
 ```
-cre/loan/
+cre/invoice-financing/
   types.ts            ← update: add consumerAddress, dealId, chainSelectorName to Config
   main.ts             ← update: add writeReport as final step; include txHash in proof JSON
   mock-server.ts      ← new: Node.js HTTP server on port 8787 for compliance + underwriting fixtures
@@ -61,49 +61,49 @@ cre/loan/
 
 ## Action Items
 
-**[x] Add `consumerAddress`, `dealId`, `chainSelectorName` to `Config` in `cre/loan/types.ts`**
+**[x] Add `consumerAddress`, `dealId`, `chainSelectorName` to `Config` in `cre/invoice-financing/types.ts`**
 
-Implement: Update `cre/loan/types.ts` to add `consumerAddress: string`, `dealId: number`, and `chainSelectorName: string` to the `Config` type.
+Implement: Update `cre/invoice-financing/types.ts` to add `consumerAddress: string`, `dealId: number`, and `chainSelectorName: string` to the `Config` type.
 
 Verify:
 ```bash
-grep -c "chainSelectorName" cre/loan/types.ts
+grep -c "chainSelectorName" cre/invoice-financing/types.ts
 ```
 → `1`
 
 ---
 
-**[x] Add `evmClient.writeReport()` as final step in `cre/loan/main.ts`**
+**[x] Add `evmClient.writeReport()` as final step in `cre/invoice-financing/main.ts`**
 
-Implement: Update `cre/loan/main.ts` to import `EVMClientCapability` from `@chainlink/cre-sdk` and `encodeAbiParameters`, `parseAbiParameters` from `viem`; at the end of `onInvoiceSubmitted`, encode `(BigInt(config.dealId), underwriting.approved)` as `(uint256, bool)`, call `runtime.report(encoded)` to produce a signed report, call `evmClient.writeReport()` targeting `config.consumerAddress` on `config.chainSelectorName` with `gasLimit: 500000n`, and include `txHash` from the result in the returned proof JSON.
+Implement: Update `cre/invoice-financing/main.ts` to import `EVMClientCapability` from `@chainlink/cre-sdk` and `encodeAbiParameters`, `parseAbiParameters` from `viem`; at the end of `onInvoiceSubmitted`, encode `(BigInt(config.dealId), underwriting.approved)` as `(uint256, bool)`, call `runtime.report(encoded)` to produce a signed report, call `evmClient.writeReport()` targeting `config.consumerAddress` on `config.chainSelectorName` with `gasLimit: 500000n`, and include `txHash` from the result in the returned proof JSON.
 
 Verify:
 ```bash
-grep -c "writeReport" cre/loan/main.ts
+grep -c "writeReport" cre/invoice-financing/main.ts
 ```
 → `1`
 
 ---
 
-**[x] Create `cre/loan/mock-server.ts` — fixture HTTP server**
+**[x] Create `cre/invoice-financing/mock-server.ts` — fixture HTTP server**
 
-Implement: Create `cre/loan/mock-server.ts` — a Node.js HTTP server on port 8787 that responds to `POST /compliance` with `{ kyc: "pass", kyb: "pass", sanctions: "clear" }` and `POST /underwriting` with `{ score: 82, approved: true, maxAdvanceUsdc: 40000 }`; all other routes return 404.
+Implement: Create `cre/invoice-financing/mock-server.ts` — a Node.js HTTP server on port 8787 that responds to `POST /compliance` with `{ kyc: "pass", kyb: "pass", sanctions: "clear" }` and `POST /underwriting` with `{ score: 82, approved: true, maxAdvanceUsdc: 40000 }`; all other routes return 404.
 
 Verify:
 ```bash
-npx ts-node cre/loan/mock-server.ts & sleep 1 && curl -s -X POST http://localhost:8787/compliance -H "Content-Type: application/json" -d '{}' | grep -c '"kyc"' && kill %1
+npx ts-node cre/invoice-financing/mock-server.ts & sleep 1 && curl -s -X POST http://localhost:8787/compliance -H "Content-Type: application/json" -d '{}' | grep -c '"kyc"' && kill %1
 ```
 → `1`
 
 ---
 
-**[x] Wire `cre/loan/config.staging.json`**
+**[x] Wire `cre/invoice-financing/config.staging.json`**
 
-Implement: Update `cre/loan/config.staging.json` to set `complianceApiUrl` to `"http://localhost:8787/compliance"`, `underwritingApiUrl` to `"http://localhost:8787/underwriting"`, and add `consumerAddress: "PROOF_ESCROW_ADDRESS_HERE"`, `dealId: 1`, `chainSelectorName: "arc-testnet"`.
+Implement: Update `cre/invoice-financing/config.staging.json` to set `complianceApiUrl` to `"http://localhost:8787/compliance"`, `underwritingApiUrl` to `"http://localhost:8787/underwriting"`, and add `consumerAddress: "PROOF_ESCROW_ADDRESS_HERE"`, `dealId: 1`, `chainSelectorName: "arc-testnet"`.
 
 Verify:
 ```bash
-node -e "const c = require('./cre/loan/config.staging.json'); console.log(c.chainSelectorName)"
+node -e "const c = require('./cre/invoice-financing/config.staging.json'); console.log(c.chainSelectorName)"
 ```
 → `arc-testnet`
 
@@ -112,8 +112,8 @@ node -e "const c = require('./cre/loan/config.staging.json'); console.log(c.chai
 **End-to-end verify (after TECH-179 contract is deployed and `consumerAddress` is filled in):**
 
 ```bash
-npx ts-node cre/loan/mock-server.ts &
-cre workflow simulate loan \
+npx ts-node cre/invoice-financing/mock-server.ts &
+cre workflow simulate invoice-financing \
   --target staging-settings \
   --non-interactive \
   --trigger-index 0 \

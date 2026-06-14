@@ -53,7 +53,7 @@ apps/studio/__tests__/api/
 └── underwriting/
     └── route.test.ts         ← verifies 200 + shape of underwriting response
 
-cre/loan/
+cre/invoice-financing/
 └── config.staging.json       ← complianceApiUrl + underwritingApiUrl → localhost:3000
 ```
 
@@ -87,10 +87,10 @@ cd apps/studio && npx vitest run __tests__/api/underwriting/route.test.ts
 
 **[x] Update CRE config URLs to point at studio**
 
-Implement: Update `cre/loan/config.staging.json` — set `complianceApiUrl` to `http://localhost:3000/api/compliance` and `underwritingApiUrl` to `http://localhost:3000/api/underwriting`.
+Implement: Update `cre/invoice-financing/config.staging.json` — set `complianceApiUrl` to `http://localhost:3000/api/compliance` and `underwritingApiUrl` to `http://localhost:3000/api/underwriting`.
 
 Verify:
 ```bash
-grep 'localhost:3000' cre/loan/config.staging.json | wc -l | tr -d ' '
+grep 'localhost:3000' cre/invoice-financing/config.staging.json | wc -l | tr -d ' '
 ```
 → `2`

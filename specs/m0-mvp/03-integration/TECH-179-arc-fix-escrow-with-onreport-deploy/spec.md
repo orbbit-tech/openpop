@@ -106,7 +106,7 @@ contracts/
   scripts/
     deploy.ts              ← new: deploy ProofGatedEscrow, print PROOF_ESCROW_ADDRESS
     setup.ts               ← new: createDeal + deposit, print DEAL_ID=1
-.env.example               ← update: add DEPLOYER_PRIVATE_KEY, USDC_ADDRESS, RECIPIENT_ADDRESS; remove DAIRY_API_URL
+.env.example               ← update: add DEPLOYER_PRIVATE_KEY, USDC_ADDRESS, RECIPIENT_ADDRESS; remove DAIRY_PRICING_API_URL
 ```
 
 ---
@@ -175,7 +175,7 @@ cd contracts && npx hardhat run scripts/setup.ts --network arc 2>&1 | grep -c "D
 
 **[ ] Update `.env.example`**
 
-Implement: Add `DEPLOYER_PRIVATE_KEY`, `USDC_ADDRESS`, `RECIPIENT_ADDRESS` to `.env.example`. Remove `DAIRY_API_URL`. Keep all existing Dynamic and Arc variables.
+Implement: Add `DEPLOYER_PRIVATE_KEY`, `USDC_ADDRESS`, `RECIPIENT_ADDRESS` to `.env.example`. Remove `DAIRY_PRICING_API_URL`. Keep all existing Dynamic and Arc variables.
 
 Verify:
 ```bash

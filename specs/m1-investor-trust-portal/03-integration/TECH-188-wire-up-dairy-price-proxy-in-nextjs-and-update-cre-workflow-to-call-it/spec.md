@@ -43,7 +43,7 @@ flowchart TD
 - The proxy must return `{ price: number, unit: string }` — CRE treats any non-2xx or missing field as a workflow error; no fallback to mock
 - `runInNodeMode` runs the fetch closure on each node independently — price is aggregated by `median` across nodes; `unit` must be `identical`
 - `workflow/run/route.ts` no longer passes `dairyPriceUsdPerLb` in the trigger payload — the workflow fetches the price itself
-- The x402 payment uses `X402_PRIVATE_KEY` (Base Sepolia EOA) — same credential already used by `workflow/run/route.ts`, now owned by the proxy route
+- The x402 payment uses `DYNAMIC_WALLET_PASSWORD` (Base Sepolia EOA) — same credential already used by `workflow/run/route.ts`, now owned by the proxy route
 
 ---
 
@@ -52,11 +52,11 @@ flowchart TD
 ```
 apps/studio/src/app/api/
   dairy-price/
-    route.ts              ← NEW: GET handler — x402 payment → DAIRY_API_URL → { price, unit }
+    route.ts              ← NEW: GET handler — x402 payment → DAIRY_PRICING_API_URL → { price, unit }
   workflow/run/
     route.ts              ← MODIFIED: remove dairy fetch, wrapFetchWithPayment, dairyPriceUsdPerLb injection
 
-cre/loan/
+cre/invoice-financing/
   types.ts                ← MODIFIED: add dairyPriceApiUrl: string to Config
   config.staging.json     ← MODIFIED: add "dairyPriceApiUrl": "http://localhost:3000/api/dairy-price"
   steps/
@@ -81,11 +81,11 @@ cd apps/studio && npx vitest run __tests__/api/dairy-price/route.test.ts
 
 **[x] Add `/api/dairy-price` GET route to studio**
 
-Implement: Create `apps/studio/src/app/api/dairy-price/route.ts` — GET handler that builds a viem wallet client from `X402_PRIVATE_KEY` on Base Sepolia, wraps fetch with x402 payment, calls `DAIRY_API_URL`, and returns `{ price, unit }`.
+Implement: Create `apps/studio/src/app/api/dairy-price/route.ts` — GET handler that builds a viem wallet client from `DYNAMIC_WALLET_PASSWORD` on Base Sepolia, wraps fetch with x402 payment, calls `DAIRY_PRICING_API_URL`, and returns `{ price, unit }`.
 
 Verify:
 ```
-grep -n "wrapFetchWithPayment\|DAIRY_API_URL" apps/studio/src/app/api/dairy-price/route.ts
+grep -n "wrapFetchWithPayment\|DAIRY_PRICING_API_URL" apps/studio/src/app/api/dairy-price/route.ts
 ```
 → exits 0, prints lines containing both identifiers
 
@@ -93,11 +93,11 @@ grep -n "wrapFetchWithPayment\|DAIRY_API_URL" apps/studio/src/app/api/dairy-pric
 
 **[x] Add `dairyPriceApiUrl` to CRE Config type**
 
-Implement: Update `cre/loan/types.ts` to add `dairyPriceApiUrl: string` to the `Config` type.
+Implement: Update `cre/invoice-financing/types.ts` to add `dairyPriceApiUrl: string` to the `Config` type.
 
 Verify:
 ```
-grep "dairyPriceApiUrl" cre/loan/types.ts
+grep "dairyPriceApiUrl" cre/invoice-financing/types.ts
 ```
 → prints `dairyPriceApiUrl: string`
 
@@ -105,11 +105,11 @@ grep "dairyPriceApiUrl" cre/loan/types.ts
 
 **[x] Add `dairyPriceApiUrl` to CRE staging config**
 
-Implement: Update `cre/loan/config.staging.json` to add `"dairyPriceApiUrl": "http://localhost:3000/api/dairy-price"`.
+Implement: Update `cre/invoice-financing/config.staging.json` to add `"dairyPriceApiUrl": "http://localhost:3000/api/dairy-price"`.
 
 Verify:
 ```
-jq '.dairyPriceApiUrl' cre/loan/config.staging.json
+jq '.dairyPriceApiUrl' cre/invoice-financing/config.staging.json
 ```
 → prints `"http://localhost:3000/api/dairy-price"`
 
@@ -117,11 +117,11 @@ jq '.dairyPriceApiUrl' cre/loan/config.staging.json
 
 **[x] Update `getDairyCommodityPrice` to call proxy via `runInNodeMode`**
 
-Implement: Rewrite `cre/loan/steps/dairy-commodity-price.ts` to use `HTTPClientCapability.runInNodeMode` — fetch closure calls `runtime.config.dairyPriceApiUrl`, aggregates `price` by median and `unit` by identical; remove `req` parameter dependency.
+Implement: Rewrite `cre/invoice-financing/steps/dairy-commodity-price.ts` to use `HTTPClientCapability.runInNodeMode` — fetch closure calls `runtime.config.dairyPriceApiUrl`, aggregates `price` by median and `unit` by identical; remove `req` parameter dependency.
 
 Verify:
 ```
-grep -n "runInNodeMode\|dairyPriceApiUrl" cre/loan/steps/dairy-commodity-price.ts
+grep -n "runInNodeMode\|dairyPriceApiUrl" cre/invoice-financing/steps/dairy-commodity-price.ts
 ```
 → prints at least two lines, one containing each identifier
 
@@ -133,6 +133,6 @@ Implement: Update `apps/studio/src/app/api/workflow/run/route.ts` to remove the 
 
 Verify:
 ```
-grep -n "X402_PRIVATE_KEY\|dairyPriceUsdPerLb\|wrapFetchWithPayment" apps/studio/src/app/api/workflow/run/route.ts
+grep -n "DYNAMIC_WALLET_PASSWORD\|dairyPriceUsdPerLb\|wrapFetchWithPayment" apps/studio/src/app/api/workflow/run/route.ts
 ```
 → exits 0 with empty output
