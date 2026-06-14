@@ -10,15 +10,19 @@
 
 ### Demos
 
-OpenPop verifiable workflow 
+Live Studio
+https://openpop.vercel.app/
+
+
+Invoice Financing Verifiable Workflow 
 
 https://youtu.be/lS5N3-kqoGE
 
-OpenPop MCP
+Proof MCP
 
 https://youtu.be/-wDAQe2TOuE
 
-OpenPop CRE workflow run
+CRE workflow run
 
 https://youtu.be/Wh8rcqJCsk8
 
