@@ -1,6 +1,6 @@
 {
-  "complianceApiUrl": "http://localhost:8787/compliance",
-  "underwritingApiUrl": "http://localhost:8787/underwriting",
+  "complianceApiUrl": "http://localhost:3000/api/compliance",
+  "underwritingApiUrl": "http://localhost:3000/api/underwriting",
   "complianceApiKeyOwner": "DYNAMIC_SERVER_WALLET_ADDRESS_HERE",
   "underwritingApiKeyOwner": "DYNAMIC_SERVER_WALLET_ADDRESS_HERE",
   "dairyPriceMockUsdPerLb": 2.13,
