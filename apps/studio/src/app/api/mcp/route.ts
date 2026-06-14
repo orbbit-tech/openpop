@@ -13,6 +13,10 @@ type JsonRpcBody = {
   }
 }
 
+export async function GET(): Promise<NextResponse> {
+  return NextResponse.json({ status: 'ok', server: 'openpop-mcp', version: '0.1.0' })
+}
+
 /**
  * Stateless MCP Streamable HTTP endpoint (protocol 2025-03-26).
  * Each POST is a self-contained JSON-RPC exchange — no session or streaming needed

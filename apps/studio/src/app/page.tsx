@@ -47,7 +47,7 @@ export default function Home() {
 
   return (
     <>
-      <Nav onOpen={() => setSheetOpen(true)} />
+      <Nav onOpen={() => setSheetOpen(true)} txHash={proof.txHash} />
       <div
         style={{
           maxWidth: 820,

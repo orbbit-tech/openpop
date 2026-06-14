@@ -1,8 +1,12 @@
+const ARC_EXPLORER = 'https://testnet.arcscan.app'
+
 interface NavProps {
   onOpen: () => void
+  txHash: string
 }
 
-export function Nav({ onOpen }: NavProps) {
+export function Nav({ onOpen, txHash }: NavProps) {
+  const explorerUrl = `${ARC_EXPLORER}/tx/${txHash}`
   return (
     <nav
       style={{
@@ -67,7 +71,9 @@ export function Nav({ onOpen }: NavProps) {
         </button>
 
         <a
-          href="#"
+          href={explorerUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           style={{
             display: 'inline-flex',
             alignItems: 'center',

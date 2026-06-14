@@ -2,7 +2,7 @@
   "mcpServers": {
     "openpop": {
       "type": "http",
-      "url": "http://localhost:3000/api/mcp"
+      "url": "https://localhost:3000/api/mcp"
     },
     "linear-server": {
       "type": "http",

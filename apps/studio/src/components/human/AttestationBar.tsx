@@ -4,8 +4,12 @@ interface Props {
   proof: Proof
 }
 
+const ARC_EXPLORER = 'https://testnet.arcscan.app'
+
 export function AttestationBar({ proof }: Props) {
-  const txShort = `${proof.txHash.slice(0, 6)}…${proof.txHash.slice(-4)}`
+  const txShort = proof.txHash.startsWith('0x')
+    ? `${proof.txHash.slice(0, 8)}…${proof.txHash.slice(-6)}`
+    : proof.txHash
 
   return (
     <div
@@ -30,7 +34,20 @@ export function AttestationBar({ proof }: Props) {
       <Sep />
       <AttestItem label="Block">Arc {proof.blockNumber.toLocaleString()}</AttestItem>
       <Sep />
-      <AttestItem label="Tx" mono>{txShort}</AttestItem>
+      <AttestItem label="Tx" mono>
+        {proof.txHash.startsWith('0x') ? (
+          <a
+            href={`${ARC_EXPLORER}/tx/${proof.txHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--teal)', textDecoration: 'none' }}
+          >
+            {txShort} ↗
+          </a>
+        ) : (
+          txShort
+        )}
+      </AttestItem>
     </div>
   )
 }
