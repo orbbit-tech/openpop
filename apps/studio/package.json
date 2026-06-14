@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
+    "@dynamic-labs/ethereum": "^4.88.6",
+    "@dynamic-labs/sdk-react-core": "^4.88.6",
     "@xyflow/react": "^12.11.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
