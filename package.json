@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "create-wallet": "tsx --env-file=apps/studio/.env.local scripts/create-server-wallet.ts",
+    "seed-proofs": "tsx scripts/seed-proofs.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
