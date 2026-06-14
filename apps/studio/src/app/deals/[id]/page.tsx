@@ -47,12 +47,14 @@ export default function DealDetailPage() {
       <Nav />
       <div
         style={{
-          maxWidth: 900,
+          maxWidth: 1100,
           margin: '0 auto',
-          padding: '32px 24px 64px',
+          padding: '12px 24px 12px',
+          height: 'calc(100vh - 52px)',
           display: 'flex',
           flexDirection: 'column',
           gap: 10,
+          overflow: 'hidden',
         }}
       >
         {/* Deal header */}
@@ -119,27 +121,25 @@ export default function DealDetailPage() {
 
           {/* Attestation section */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {/* TX hash — hero */}
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: 'var(--text-3)', flexShrink: 0 }}>
-                Tx
-              </span>
-              {proof.txHash.startsWith('0x') ? (
-                <a
-                  href={`${ARC_EXPLORER}/tx/${proof.txHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--teal)', textDecoration: 'none', letterSpacing: '-0.01em' }}
-                >
-                  {txShort} ↗
-                </a>
-              ) : (
-                <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--text-2)' }}>{txShort}</span>
-              )}
-            </div>
-
-            {/* Secondary metadata */}
+            {/* Attestation metadata — all in one row, code font for values */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' as const }}>
+              {/* Tx hash */}
+              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: 'var(--text-3)' }}>Tx</span>
+                {proof.txHash.startsWith('0x') ? (
+                  <a
+                    href={`${ARC_EXPLORER}/tx/${proof.txHash}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 400, color: 'var(--teal)', textDecoration: 'none' }}
+                  >
+                    {txShort} ↗
+                  </a>
+                ) : (
+                  <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-2)' }}>{txShort}</span>
+                )}
+              </span>
+              <span style={{ color: 'var(--border-soft)' }}>·</span>
               {[
                 { label: 'Block', value: `Arc ${proof.blockNumber.toLocaleString()}` },
                 { label: 'Consensus', value: `${proof.consensus.agreed}/${proof.consensus.total} nodes` },
@@ -147,7 +147,7 @@ export default function DealDetailPage() {
               ].map(({ label, value }, i, arr) => (
                 <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: 'var(--text-3)' }}>{label}</span>
-                  <span style={{ fontSize: 11, color: 'var(--text-2)' }}>{value}</span>
+                  <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-2)' }}>{value}</span>
                   {i < arr.length - 1 && <span style={{ color: 'var(--border-soft)', marginLeft: 2 }}>·</span>}
                 </span>
               ))}
@@ -155,7 +155,10 @@ export default function DealDetailPage() {
           </div>
         </div>
 
-        <WorkflowCanvas proof={proof} />
+        {/* Canvas fills remaining viewport height */}
+        <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
+          <WorkflowCanvas proof={proof} />
+        </div>
       </div>
 
       <AgentSheet open={agentOpen} onClose={() => setAgentOpen(false)} proof={proof} />
