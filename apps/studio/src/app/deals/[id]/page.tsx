@@ -61,55 +61,43 @@ export default function DealDetailPage() {
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
-              <button
-                onClick={() => setAgentOpen(true)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  height: 30,
-                  padding: '0 12px',
-                  borderRadius: 4,
-                  fontSize: 12,
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                  border: '1px solid var(--border-soft)',
-                  background: 'var(--surface)',
-                  color: 'var(--text-2)',
-                  fontFamily: 'inherit',
-                }}
-              >
-                For Agents
-              </button>
-              <button
-                onClick={() => setInvestOpen(true)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  height: 30,
-                  padding: '0 12px',
-                  borderRadius: 4,
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  border: '1px solid var(--teal)',
-                  background: 'var(--teal)',
-                  color: '#fff',
-                  fontFamily: 'inherit',
-                }}
-              >
-                Invest
-              </button>
+              {(['For Agents', 'Invest New Deal'] as const).map((label) => {
+                const isPrimary = label === 'Invest New Deal'
+                return (
+                  <button
+                    key={label}
+                    onClick={() => isPrimary ? setInvestOpen(true) : setAgentOpen(true)}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: 116,
+                      height: 30,
+                      borderRadius: 4,
+                      fontSize: 12,
+                      fontWeight: isPrimary ? 600 : 500,
+                      cursor: 'pointer',
+                      border: isPrimary ? '1px solid var(--teal)' : '1px solid var(--border-soft)',
+                      background: isPrimary ? 'var(--teal)' : 'var(--surface)',
+                      color: isPrimary ? '#fff' : 'var(--text-2)',
+                      fontFamily: 'inherit',
+                    }}
+                  >
+                    {label}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
           {/* Divider */}
           <div style={{ height: 1, background: 'var(--border-soft)' }} />
 
-          {/* Row 2: attestation — Tx most prominent */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' as const }}>
-            {/* Tx — most important, shown first and larger */}
-            <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: 'var(--text-3)' }}>
+          {/* Attestation section */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {/* TX hash — hero */}
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase' as const, color: 'var(--text-3)', flexShrink: 0 }}>
                 Tx
               </span>
               {proof.txHash.startsWith('0x') ? (
@@ -117,35 +105,29 @@ export default function DealDetailPage() {
                   href={`${ARC_EXPLORER}/tx/${proof.txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  style={{ fontFamily: 'monospace', fontSize: 12, fontWeight: 600, color: 'var(--teal)', textDecoration: 'none' }}
+                  style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--teal)', textDecoration: 'none', letterSpacing: '-0.01em' }}
                 >
                   {txShort} ↗
                 </a>
               ) : (
-                <span style={{ fontFamily: 'monospace', fontSize: 12, color: 'var(--text-2)' }}>{txShort}</span>
+                <span style={{ fontFamily: 'monospace', fontSize: 14, fontWeight: 700, color: 'var(--text-2)' }}>{txShort}</span>
               )}
-            </span>
+            </div>
 
-            <span style={{ color: 'var(--border-soft)', fontSize: 11 }}>·</span>
-
-            <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: 'var(--text-3)' }}>Block</span>
-              <span style={{ fontSize: 11, color: 'var(--text-2)' }}>Arc {proof.blockNumber.toLocaleString()}</span>
-            </span>
-
-            <span style={{ color: 'var(--border-soft)', fontSize: 11 }}>·</span>
-
-            <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: 'var(--text-3)' }}>Consensus</span>
-              <span style={{ fontSize: 11, color: 'var(--text-2)' }}>{proof.consensus.agreed} / {proof.consensus.total} nodes</span>
-            </span>
-
-            <span style={{ color: 'var(--border-soft)', fontSize: 11 }}>·</span>
-
-            <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: 'var(--text-3)' }}>Prover</span>
-              <span style={{ fontSize: 11, color: 'var(--text-2)' }}>{proof.prover}</span>
-            </span>
+            {/* Secondary metadata */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' as const }}>
+              {[
+                { label: 'Block', value: `Arc ${proof.blockNumber.toLocaleString()}` },
+                { label: 'Consensus', value: `${proof.consensus.agreed}/${proof.consensus.total} nodes` },
+                { label: 'Prover', value: proof.prover },
+              ].map(({ label, value }, i, arr) => (
+                <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: 'var(--text-3)' }}>{label}</span>
+                  <span style={{ fontSize: 11, color: 'var(--text-2)' }}>{value}</span>
+                  {i < arr.length - 1 && <span style={{ color: 'var(--border-soft)', marginLeft: 2 }}>·</span>}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
 
