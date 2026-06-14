@@ -128,8 +128,7 @@ export function WorkflowCanvas({ proof }: Props) {
   // Vertical positions (all root nodes at x=0, centered via nodeOrigin [0.5, 0])
   const TRIGGER_Y = 0
   const GROUP_Y = NODE_H + 48
-  const BOUNDARY_Y = GROUP_Y + groupH + 36
-  const SIG_Y = BOUNDARY_Y + 44
+  const SIG_Y = GROUP_Y + groupH + 36
   const USDC_Y = SIG_Y + NODE_H + 24
 
   const nodes: Node[] = useMemo(() => [
@@ -165,14 +164,6 @@ export function WorkflowCanvas({ proof }: Props) {
       },
     })),
     {
-      id: 'zone-boundary',
-      type: 'zoneBoundary',
-      position: { x: 0, y: BOUNDARY_Y },
-      data: {
-        consensus: `${proof.consensus.agreed}/${proof.consensus.total} nodes`,
-      },
-    },
-    {
       id: 'sig-verified',
       type: 'proofNode',
       position: { x: 0, y: SIG_Y },
@@ -195,7 +186,7 @@ export function WorkflowCanvas({ proof }: Props) {
       },
     },
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [proof, txUrl, groupH, GROUP_Y, BOUNDARY_Y, SIG_Y, USDC_Y])
+  ], [proof, txUrl, groupH, GROUP_Y, SIG_Y, USDC_Y])
 
   const edges: Edge[] = useMemo(() => {
     const soft = { stroke: 'hsla(180, 85%, 32%, 0.28)', strokeWidth: 1.5 }
@@ -210,8 +201,7 @@ export function WorkflowCanvas({ proof }: Props) {
         type: 'smoothstep',
         style: soft,
       })),
-      { id: 'e-exit', source: `step-${proof.steps.length - 1}`, target: 'zone-boundary', type: 'smoothstep', style: dashed },
-      { id: 'e-cross', source: 'zone-boundary', target: 'sig-verified', type: 'smoothstep', style: dashed },
+      { id: 'e-exit', source: `step-${proof.steps.length - 1}`, target: 'sig-verified', type: 'smoothstep', style: dashed },
       { id: 'e-z2', source: 'sig-verified', target: 'usdc-released', type: 'smoothstep', style: soft },
     ]
   }, [proof])

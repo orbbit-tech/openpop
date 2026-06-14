@@ -84,6 +84,20 @@ export default function DealDetailPage() {
               <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-1)', letterSpacing: '-0.02em' }}>
                 {proof.companyName} — Invoice {proof.approved ? 'Approved' : 'Rejected'}
               </span>
+              <span style={{
+                padding: '2px 7px',
+                borderRadius: 100,
+                fontSize: 9,
+                fontWeight: 600,
+                letterSpacing: '0.06em',
+                textTransform: 'uppercase' as const,
+                background: 'hsl(38, 90%, 96%)',
+                border: '1px solid hsl(38, 80%, 82%)',
+                color: 'hsl(38, 70%, 38%)',
+                flexShrink: 0,
+              }}>
+                CRE Simulated
+              </span>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
