@@ -151,7 +151,9 @@ export function WorkflowCanvas({ proof }: Props) {
         position: { x: 0, y: zone2Start },
         data: {
           label: 'Signature Verified',
-          meta: `MockKeystoneForwarder · BFT report accepted`,
+          meta: proof.workflowExecutionId
+            ? `Report ${proof.reportId ?? '—'} · exec ${proof.workflowExecutionId.slice(0, 8)}…${proof.workflowExecutionId.slice(-4)}`
+            : 'MockKeystoneForwarder · BFT report accepted',
           badge: 'On-Chain',
           status: 'on-chain',
         },

@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MOCK_PROOF } from '@/lib/fixtures'
+import { fetchArcReceipt } from '@/lib/arc'
 import { Nav } from '@/components/Nav'
 import { WorkflowCanvas } from '@/components/human/WorkflowCanvas'
 import { AgentSheet } from '@/components/agent/AgentSheet'
@@ -12,7 +13,14 @@ const ARC_EXPLORER = 'https://testnet.arcscan.app'
 export default function DealDetailPage() {
   const [agentOpen, setAgentOpen] = useState(false)
   const [investOpen, setInvestOpen] = useState(false)
-  const proof = MOCK_PROOF
+  const [proof, setProof] = useState(MOCK_PROOF)
+
+  // Hydrate Zone 2 fields from Arc RPC on mount
+  useEffect(() => {
+    fetchArcReceipt(proof.txHash).then((zone2) => {
+      if (zone2) setProof((prev) => ({ ...prev, ...zone2 }))
+    })
+  }, [proof.txHash])
 
   const txShort = proof.txHash.startsWith('0x')
     ? `${proof.txHash.slice(0, 10)}…${proof.txHash.slice(-6)}`
