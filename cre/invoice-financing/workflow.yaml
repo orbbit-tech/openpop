@@ -1,6 +1,6 @@
 staging-settings:
   user-workflow:
-    workflow-name: "loan-staging"
+    workflow-name: "invoice-financing-staging"
   workflow-artifacts:
     workflow-path: "./main.ts"
     config-path: "./config.staging.json"

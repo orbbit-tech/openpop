@@ -18,8 +18,8 @@ const onInvoiceSubmitted = (runtime: Runtime<Config>, triggerEvent: HTTPPayload)
   // Step 1 — Compliance screening must pass before financial data is assessed.
   const compliance = runCompliance(runtime, { businessName, invoiceId })
 
-  // Step 2 — Commodity price is used in underwriting to validate invoice realism.
-  const dairyPrice = getDairyCommodityPrice(runtime)
+  // Step 2 — Commodity price injected by the studio route via x402 fetch before CRE is called.
+  const dairyPrice = getDairyCommodityPrice(runtime, req.dairyPriceUsdPerLb ?? config.dairyPriceMockUsdPerLb)
 
   // Step 3 — Score the deal using compliance verdict and live commodity price.
   const underwriting = runUnderwriting(runtime, { businessName, invoiceId, amount, dairyPriceUsdPerLb: dairyPrice.price })

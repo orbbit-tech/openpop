@@ -1,4 +1,4 @@
-# CRE Workflow — OpenPop Loan Verification
+# CRE Workflow — OpenPop Invoice Financing Verification
 
 Runs a 3-step compliance and underwriting workflow locally via the Chainlink CRE CLI. With `--broadcast`, it submits a signed receipt to `ProofGatedEscrow` on Arc testnet and returns a real on-chain tx hash.
 
@@ -9,7 +9,7 @@ cre/
   project.yaml          ← RPC endpoint for Arc testnet
   secrets.yaml          ← secret name declarations (empty — no Vault DON secrets needed for simulation)
   .env                  ← CRE_ETH_PRIVATE_KEY (never commit)
-  loan/
+  invoice-financing/
     main.ts             ← 3-step workflow handler
     workflow.yaml       ← target "staging-settings"
     config.staging.json ← consumerAddress, dealId, chainSelectorName
@@ -29,7 +29,7 @@ cre version   # must be v1.20.0+
 
 **2. Install workflow dependencies** (run once)
 ```bash
-cd loan && bun install && cd ..
+cd invoice-financing && bun install && cd ..
 ```
 
 **3. Arc testnet USDC**
@@ -50,7 +50,7 @@ Open **two terminals**.
 
 **Terminal 1 — start offchain services** (compliance + underwriting endpoints):
 ```bash
-cd loan && npx ts-node mock-server.ts
+cd invoice-financing && npx ts-node mock-server.ts
 # Mock server listening on :8787
 ```
 
@@ -58,7 +58,7 @@ cd loan && npx ts-node mock-server.ts
 ```bash
 cd cre   # must run from here (project root, where project.yaml lives)
 
-cre workflow simulate loan \
+cre workflow simulate invoice-financing \
   --target staging-settings \
   --broadcast \
   --non-interactive \
@@ -79,7 +79,7 @@ The workflow returns JSON to stdout. `apps/studio/src/app/api/workflow/run/route
 
 ## Config
 
-`loan/config.staging.json` — key fields:
+`invoice-financing/config.staging.json` — key fields:
 
 | Field | Value |
 |---|---|
