@@ -4,21 +4,26 @@ const mockFetchWithPayment = vi.hoisted(() =>
   vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ price: 2.13, unit: 'USD/lb' }) }))
 )
 
+const mockGetEvmWallets = vi.hoisted(() => vi.fn().mockResolvedValue([{
+  walletId: 'test-wallet-id',
+  accountAddress: '0x2F2Af5d1c240eF9AaDbef4DFa74c50B6485ec452',
+  chainName: 'EVM',
+  thresholdSignatureScheme: 'TWO_OF_TWO',
+}]))
+
+const mockGetWalletClient = vi.hoisted(() => vi.fn().mockResolvedValue({}))
+const mockAuthenticateApiToken = vi.hoisted(() => vi.fn().mockResolvedValue(undefined))
+
 vi.mock('x402-fetch', () => ({
   wrapFetchWithPayment: () => mockFetchWithPayment,
 }))
 
-vi.mock('viem', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('viem')>()
-  return {
-    ...actual,
-    createWalletClient: () => ({}),
-    http: () => ({}),
-  }
-})
-
-vi.mock('viem/accounts', () => ({
-  privateKeyToAccount: () => ({ address: '0x0000000000000000000000000000000000000001' }),
+vi.mock('@dynamic-labs-wallet/node-evm', () => ({
+  DynamicEvmWalletClient: vi.fn().mockImplementation(() => ({
+    authenticateApiToken: mockAuthenticateApiToken,
+    getEvmWallets: mockGetEvmWallets,
+    getWalletClient: mockGetWalletClient,
+  })),
 }))
 
 vi.mock('viem/chains', () => ({
@@ -29,9 +34,19 @@ const { GET } = await import('../../../src/app/api/dairy-price/route')
 
 describe('GET /api/dairy-price', () => {
   beforeEach(() => {
-    vi.resetAllMocks()
-    process.env.X402_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001'
-    process.env.DAIRY_API_URL = 'https://g78md4c7ke.execute-api.us-east-1.amazonaws.com/dairy/cream/price'
+    vi.clearAllMocks()
+    mockGetEvmWallets.mockResolvedValue([{
+      walletId: 'test-wallet-id',
+      accountAddress: '0x2F2Af5d1c240eF9AaDbef4DFa74c50B6485ec452',
+      chainName: 'EVM',
+      thresholdSignatureScheme: 'TWO_OF_TWO',
+    }])
+    mockGetWalletClient.mockResolvedValue({})
+    mockAuthenticateApiToken.mockResolvedValue(undefined)
+    process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID = 'test-env-id'
+    process.env.DYNAMIC_AUTH_TOKEN = 'test-auth-token'
+    process.env.DYNAMIC_WALLET_PASSWORD = 'test-password'
+    process.env.DAIRY_PRICING_API_URL = 'https://g78md4c7ke.execute-api.us-east-1.amazonaws.com/dairy/cream/price'
   })
 
   it('[happy-path] x402 fetch succeeds → returns 200 with { price: 2.13, unit: "USD/lb" }', async () => {

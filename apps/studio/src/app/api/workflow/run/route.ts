@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { spawnSync } from 'node:child_process'
-import { writeFileSync } from 'node:fs'
+import { writeFileSync, mkdirSync } from 'node:fs'
 import path from 'node:path'
+import { wrapFetchWithPayment } from 'x402-fetch'
+import { DynamicEvmWalletClient } from '@dynamic-labs-wallet/node-evm'
+import { baseSepolia } from 'viem/chains'
 import type { Proof } from '../../../../types/proof'
+import { getDealConfig } from '../../../../lib/deals'
 
 type CREResult = {
   invoiceId: string
@@ -35,18 +39,56 @@ async function fetchBlockNumber(txHash: string): Promise<number | null> {
   }
 }
 
-export async function POST(_request?: NextRequest): Promise<NextResponse> {
+export async function POST(request?: NextRequest): Promise<NextResponse> {
+  // Resolve deal params from body, falling back to the deal registry, then Gallivant defaults.
+  let bodyInvoiceId: string | undefined
+  let bodyAmount: number | undefined
+  let bodyBusinessName: string | undefined
+  try {
+    const body = await request?.json() as { invoiceId?: string; amount?: number; businessName?: string } | undefined
+    bodyInvoiceId = body?.invoiceId
+    bodyAmount = body?.amount
+    bodyBusinessName = body?.businessName
+  } catch { /* body is optional */ }
+
+  const invoiceId = bodyInvoiceId ?? 'gallivant-001'
+  const dealConfig = getDealConfig(invoiceId)
+  const amount = bodyAmount ?? dealConfig?.amount ?? 50_000
+  const businessName = bodyBusinessName ?? dealConfig?.businessName ?? 'Gallivant Ice Cream'
+  const invoiceAmount = dealConfig?.invoiceAmount ?? '$50,000 · Walmart Net-30'
+
+  // Fetch live dairy price via x402 — falls back to mock config value if unavailable.
+  let dairyPriceUsdPerLb: number | undefined
+  try {
+    const evmClient = new DynamicEvmWalletClient({
+      environmentId: process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID!,
+    })
+    await evmClient.authenticateApiToken(process.env.DYNAMIC_AUTH_TOKEN!)
+    const wallets = await evmClient.getEvmWallets()
+    const walletClient = await evmClient.getWalletClient({
+      walletMetadata: wallets[0],
+      password: process.env.DYNAMIC_WALLET_PASSWORD!,
+      chain: baseSepolia,
+    })
+    const fetchWithPayment = wrapFetchWithPayment(fetch, walletClient as Parameters<typeof wrapFetchWithPayment>[1])
+    const res = await fetchWithPayment(process.env.DAIRY_PRICING_API_URL!)
+    if (!res.ok) throw new Error(`status ${res.status}`)
+    const data = await res.json() as { price: number; unit: string }
+    dairyPriceUsdPerLb = data.price
+  } catch { /* non-fatal — CRE falls back to dairyPriceMockUsdPerLb in config */ }
+
   const payload = JSON.stringify({
-    invoiceId: 'gallivant-001',
-    amount: 50000,
-    businessName: 'Gallivant Ice Cream',
+    invoiceId,
+    amount,
+    businessName,
+    ...(dairyPriceUsdPerLb !== undefined && { dairyPriceUsdPerLb }),
   })
 
-  // cre CLI must run from cre/ (where project.yaml lives), not cre/loan/
+  // cre CLI must run from cre/ (where project.yaml lives), not cre/invoice-financing/
   const result = spawnSync(
     'cre',
     [
-      'workflow', 'simulate', 'loan',
+      'workflow', 'simulate', 'invoice-financing',
       '--target', 'staging-settings',
       '--broadcast',
       '--non-interactive',
@@ -91,8 +133,9 @@ export async function POST(_request?: NextRequest): Promise<NextResponse> {
   const blockNumber = txHash ? await fetchBlockNumber(txHash) : null
 
   const proof: Proof = {
+    invoiceId: cre.invoiceId,
     companyName: cre.businessName,
-    invoiceAmount: '$50,000 · Walmart Net-30',
+    invoiceAmount,
     compliant:
       cre.compliance.kyc === 'pass' &&
       cre.compliance.kyb === 'pass' &&
@@ -107,26 +150,41 @@ export async function POST(_request?: NextRequest): Promise<NextResponse> {
     prover: 'CRE / BFT Consensus',
     consensus: { agreed: 7, total: 9 },
     blockNumber: blockNumber ?? 0,
+    prefetchSteps: [
+      {
+        label: 'Dairy Price Fetch',
+        badge: dairyPriceUsdPerLb !== undefined ? '💰 X402 Payment' : '📋 Mock Price',
+        status: 'completed',
+        metadata: dairyPriceUsdPerLb !== undefined
+          ? `USDA cream $${cre.dairyPrice.price}/lb · x402 paid · Base Sepolia`
+          : `USDA cream $${cre.dairyPrice.price}/lb · mock config value`,
+      },
+    ],
     steps: [
       {
         label: 'Compliance Check',
+        badge: '🧩 Offchain API',
         status: cre.compliance.kyc === 'pass' && cre.compliance.kyb === 'pass' ? 'completed' : 'failed',
         metadata: `KYC ${cre.compliance.kyc} · KYB ${cre.compliance.kyb} · OFAC ${cre.compliance.sanctions}`,
       },
       {
         label: 'Dairy Price Oracle',
+        badge: '📥 Injected',
         status: 'completed',
-        metadata: `USDA cream $${cre.dairyPrice.price}/lb · x402 paid`,
+        metadata: `$${cre.dairyPrice.price}/lb · injected from prefetch`,
       },
       {
         label: 'Underwriting Decision',
+        badge: '🧩 Offchain API',
         status: cre.underwriting.approved ? 'completed' : 'failed',
         metadata: `Score ${cre.underwriting.score} · ${cre.underwriting.approved ? 'Approved' : 'Rejected'}`,
       },
     ],
   }
 
-  writeFileSync(path.join(process.cwd(), 'proof.json'), JSON.stringify(proof, null, 2))
+  const proofsDir = path.join(process.cwd(), 'proofs')
+  mkdirSync(proofsDir, { recursive: true })
+  writeFileSync(path.join(proofsDir, `${cre.invoiceId}.json`), JSON.stringify(proof, null, 2))
 
   return NextResponse.json(proof)
 }

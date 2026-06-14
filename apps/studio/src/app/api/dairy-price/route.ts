@@ -1,16 +1,26 @@
 import { NextResponse } from 'next/server'
 import { wrapFetchWithPayment } from 'x402-fetch'
-import { createWalletClient, http } from 'viem'
+import { DynamicEvmWalletClient } from '@dynamic-labs-wallet/node-evm'
 import { baseSepolia } from 'viem/chains'
-import { privateKeyToAccount } from 'viem/accounts'
 
 export async function GET(): Promise<NextResponse> {
   try {
-    const account = privateKeyToAccount(process.env.X402_PRIVATE_KEY as `0x${string}`)
-    const walletClient = createWalletClient({ account, chain: baseSepolia, transport: http() })
-    const fetchWithPayment = wrapFetchWithPayment(fetch, walletClient as Parameters<typeof wrapFetchWithPayment>[1])
+    const evmClient = new DynamicEvmWalletClient({
+      environmentId: process.env.NEXT_PUBLIC_DYNAMIC_ENVIRONMENT_ID!,
+    })
+    await evmClient.authenticateApiToken(process.env.DYNAMIC_AUTH_TOKEN!)
 
-    const res = await fetchWithPayment(process.env.DAIRY_API_URL!)
+    const wallets = await evmClient.getEvmWallets()
+    const walletMetadata = wallets[0]
+
+    const walletClient = await evmClient.getWalletClient({
+      walletMetadata,
+      password: process.env.DYNAMIC_WALLET_PASSWORD!,
+      chain: baseSepolia,
+    })
+
+    const fetchWithPayment = wrapFetchWithPayment(fetch, walletClient as Parameters<typeof wrapFetchWithPayment>[1])
+    const res = await fetchWithPayment(process.env.DAIRY_PRICING_API_URL!)
     const data = await res.json() as { price: number; unit: string }
 
     return NextResponse.json({ price: data.price, unit: data.unit })

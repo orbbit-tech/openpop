@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { NextRequest } from 'next/server'
 import { spawnSync } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
+import { DynamicEvmWalletClient } from '@dynamic-labs-wallet/node-evm'
 import type { Receipt } from '../../../../src/types/receipt'
 
 vi.mock('node:child_process')
@@ -15,17 +16,12 @@ vi.mock('x402-fetch', () => ({
   wrapFetchWithPayment: () => mockFetchWithPayment,
 }))
 
-vi.mock('viem', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('viem')>()
-  return {
-    ...actual,
-    createWalletClient: () => ({}),
-    http: () => ({}),
-  }
-})
-
-vi.mock('viem/accounts', () => ({
-  privateKeyToAccount: () => ({ address: '0x0000000000000000000000000000000000000001' }),
+vi.mock('@dynamic-labs-wallet/node-evm', () => ({
+  DynamicEvmWalletClient: vi.fn().mockImplementation(() => ({
+    authenticateApiToken: vi.fn().mockResolvedValue(undefined),
+    getEvmWallets: vi.fn().mockResolvedValue([{ id: 'mock-wallet' }]),
+    getWalletClient: vi.fn().mockResolvedValue({}),
+  })),
 }))
 
 vi.mock('viem/chains', () => ({
@@ -69,9 +65,12 @@ function buildReceipt(overrides: Partial<Receipt> = {}): Receipt {
     prover: 'CRE / BFT Consensus',
     consensus: { agreed: 7, total: 9 },
     blockNumber: 9910,
+    prefetchSteps: [
+      { label: 'Dairy Price Fetch', status: 'completed', metadata: 'USDA cream $2.34/lb · x402 paid · Base Sepolia' },
+    ],
     steps: [
       { label: 'Compliance Check', status: 'completed', metadata: 'KYC pass · KYB pass · OFAC clean' },
-      { label: 'Dairy Price Oracle', status: 'completed', metadata: 'USDA cream $2.34/lb · x402 paid' },
+      { label: 'Dairy Price Oracle', status: 'completed', metadata: '$2.34/lb · injected from prefetch' },
       { label: 'Underwriting Decision', status: 'completed', metadata: 'Score 82 · Approved' },
     ],
     ...overrides,
@@ -88,8 +87,12 @@ describe('POST /api/workflow/run', () => {
   beforeEach(() => {
     vi.resetAllMocks()
     mockFetchWithPayment.mockResolvedValue({ ok: true, json: () => Promise.resolve({ price: 2.34, unit: 'USD/lb' }) })
-    process.env.X402_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001'
-    process.env.DAIRY_API_URL = 'https://g78md4c7ke.execute-api.us-east-1.amazonaws.com/dairy/cream/price'
+    vi.mocked(DynamicEvmWalletClient).mockImplementation(() => ({
+      authenticateApiToken: vi.fn().mockResolvedValue(undefined),
+      getEvmWallets: vi.fn().mockResolvedValue([{ id: 'mock-wallet' }]),
+      getWalletClient: vi.fn().mockResolvedValue({}),
+    }) as any)
+    process.env.DAIRY_PRICING_API_URL = 'https://g78md4c7ke.execute-api.us-east-1.amazonaws.com/dairy/cream/price'
   })
 
   it('CRE exits 0 → returns 200 with Receipt shaped from CRE stdout', async () => {
@@ -161,7 +164,7 @@ describe('POST /api/workflow/run', () => {
     expect(vi.mocked(writeFileSync)).not.toHaveBeenCalled()
   })
 
-  it('trigger payload does not contain dairyPriceUsdPerLb', async () => {
+  it('trigger payload contains dairyPriceUsdPerLb from x402 fetch', async () => {
     vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: makeCREStdout(creResult) } as any)
 
     await POST(makeRequest())
@@ -169,6 +172,6 @@ describe('POST /api/workflow/run', () => {
     const args = vi.mocked(spawnSync).mock.calls[0][1] as string[]
     const idx = args.indexOf('--http-payload')
     const payload = JSON.parse(args[idx + 1])
-    expect(payload).not.toHaveProperty('dairyPriceUsdPerLb')
+    expect(payload).toHaveProperty('dairyPriceUsdPerLb', 2.34)
   })
 })

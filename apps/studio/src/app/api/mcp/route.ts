@@ -13,31 +13,36 @@ type JsonRpcBody = {
   }
 }
 
+function ok(id: number | string | undefined, result: unknown): NextResponse {
+  return NextResponse.json({ jsonrpc: '2.0', id: id ?? null, result })
+}
+
+function err(id: number | string | undefined, code: number, message: string): NextResponse {
+  return NextResponse.json({ jsonrpc: '2.0', id: id ?? null, error: { code, message } })
+}
+
 export async function GET(): Promise<NextResponse> {
   return NextResponse.json({ status: 'ok', server: 'openpop-mcp', version: '0.1.0' })
 }
 
-/**
- * Stateless MCP Streamable HTTP endpoint (protocol 2025-03-26).
- * Each POST is a self-contained JSON-RPC exchange — no session or streaming needed
- * because get_proof is a single read with no side effects.
- */
 export async function POST(request: NextRequest): Promise<NextResponse> {
   const body = (await request.json()) as JsonRpcBody
-  const { method, params } = body
+  const { method, id, params } = body
 
-  // MCP handshake — callers send this first to confirm the protocol version.
   if (method === 'initialize') {
-    return NextResponse.json({
-      protocolVersion: '2025-03-26',
+    return ok(id, {
+      protocolVersion: '2024-11-05',
       capabilities: { tools: {} },
       serverInfo: { name: 'openpop-mcp', version: '0.1.0' },
     })
   }
 
-  // Capability discovery — advertise the one tool this server exposes.
+  if (method === 'notifications/initialized') {
+    return new NextResponse(null, { status: 204 })
+  }
+
   if (method === 'tools/list') {
-    return NextResponse.json({
+    return ok(id, {
       tools: [
         {
           name: 'get_proof',
@@ -50,41 +55,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   if (method === 'tools/call') {
     if (params?.name !== 'get_proof') {
-      return NextResponse.json(
-        { error: { code: -32601, message: 'method not found' } },
-        { status: 400 },
-      )
+      return err(id, -32601, 'method not found')
     }
 
     let raw: string
     try {
       raw = await readFile(path.join(process.cwd(), 'proof.json'), 'utf-8')
     } catch {
-      return NextResponse.json(
-        { error: { code: -32603, message: 'proof not found' } },
-        { status: 500 },
-      )
+      return err(id, -32603, 'proof not found')
     }
 
     let proof: Proof
     try {
       proof = JSON.parse(raw) as Proof
     } catch {
-      return NextResponse.json(
-        { error: { code: -32603, message: 'invalid proof JSON' } },
-        { status: 500 },
-      )
+      return err(id, -32603, 'invalid proof JSON')
     }
 
-    // MCP tool results are always a content array — text block is the standard shape
-    // for a tool that returns a structured payload as a string.
-    return NextResponse.json({
+    return ok(id, {
       content: [{ type: 'text', text: JSON.stringify(proof) }],
     })
   }
 
-  return NextResponse.json(
-    { error: { code: -32601, message: 'method not found' } },
-    { status: 400 },
-  )
+  return err(id, -32601, 'method not found')
 }
