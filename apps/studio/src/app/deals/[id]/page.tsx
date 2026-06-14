@@ -70,7 +70,7 @@ export default function DealDetailPage() {
           }}
         >
           {/* Row 1: identity + actions */}
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 32 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
               <div
                 style={{
@@ -135,7 +135,6 @@ export default function DealDetailPage() {
               <span style={{ fontFamily: 'monospace', color: 'var(--text-2)' }}>{txShort}</span>
             )}
           </div>
-          {/* Complementary metadata — smaller, muted */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 10, lineHeight: 1 }}>
             {[
               { label: 'Block', value: proof.blockNumber.toLocaleString(), mono: true },
