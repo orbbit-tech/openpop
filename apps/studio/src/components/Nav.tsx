@@ -3,9 +3,10 @@ const ARC_EXPLORER = 'https://testnet.arcscan.app'
 interface NavProps {
   onOpen?: () => void
   txHash?: string
+  onInvest?: () => void
 }
 
-export function Nav({ onOpen, txHash }: NavProps) {
+export function Nav({ onOpen, txHash, onInvest }: NavProps) {
   const explorerUrl = txHash ? `${ARC_EXPLORER}/tx/${txHash}` : undefined
   return (
     <nav
@@ -64,6 +65,29 @@ export function Nav({ onOpen, txHash }: NavProps) {
             {label}
           </span>
         ))}
+        {onInvest && (
+          <button
+            onClick={onInvest}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 5,
+              height: 30,
+              padding: '0 12px',
+              borderRadius: 4,
+              fontSize: 12,
+              fontWeight: 500,
+              cursor: 'pointer',
+              border: '1px solid var(--border-soft)',
+              background: 'var(--surface)',
+              color: 'var(--text-2)',
+              fontFamily: 'inherit',
+              transition: 'color .12s, border-color .12s',
+            }}
+          >
+            Invest
+          </button>
+        )}
         {onOpen && (
           <button
             onClick={onOpen}
