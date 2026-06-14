@@ -42,3 +42,5 @@ next-env.d.ts
 
 # runtime proof output
 proof.json
+
+certificates
