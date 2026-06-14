@@ -32,7 +32,7 @@ export function Nav({ onOpen, txHash }: NavProps) {
         </a>
 
         <a
-          href="/deals"
+          href="/"
           style={{
             fontSize: 12,
             fontWeight: 500,
