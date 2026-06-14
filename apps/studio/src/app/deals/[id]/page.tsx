@@ -119,34 +119,33 @@ export default function DealDetailPage() {
           {/* Divider */}
           <div style={{ height: 1, background: 'var(--border-soft)' }} />
 
-          {/* Attestation metadata — consistent 11px, label/value differentiated by color */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' as const, fontSize: 11, lineHeight: 1 }}>
-            {/* Tx */}
-            <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <span style={{ color: 'var(--text-3)' }}>Tx</span>
-              {proof.txHash.startsWith('0x') ? (
-                <a
-                  href={`${ARC_EXPLORER}/tx/${proof.txHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ fontFamily: 'monospace', color: 'var(--teal)', textDecoration: 'none' }}
-                >
-                  {txShort} ↗
-                </a>
-              ) : (
-                <span style={{ fontFamily: 'monospace', color: 'var(--text-2)' }}>{txShort}</span>
-              )}
-            </span>
-            <span style={{ color: 'var(--border-soft)' }}>·</span>
+          {/* Row 1: Tx hash — primary */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 12, lineHeight: 1 }}>
+            <span style={{ color: 'var(--text-3)' }}>Tx</span>
+            {proof.txHash.startsWith('0x') ? (
+              <a
+                href={`${ARC_EXPLORER}/tx/${proof.txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontFamily: 'monospace', fontWeight: 500, color: 'var(--teal)', textDecoration: 'none' }}
+              >
+                {txShort} ↗
+              </a>
+            ) : (
+              <span style={{ fontFamily: 'monospace', fontWeight: 500, color: 'var(--text-2)' }}>{txShort}</span>
+            )}
+          </div>
+          {/* Row 2: complementary metadata — secondary */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 10, lineHeight: 1 }}>
             {[
               { label: 'Block', value: proof.blockNumber.toLocaleString(), mono: true },
               { label: 'Consensus', value: `${proof.consensus.agreed}/${proof.consensus.total} nodes`, mono: false },
               { label: 'Prover', value: proof.prover, mono: false },
             ].map(({ label, value, mono }, i, arr) => (
-              <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span style={{ color: 'var(--text-3)' }}>{label}</span>
-                <span style={{ fontFamily: mono ? 'monospace' : 'inherit', color: 'var(--text-2)' }}>{value}</span>
-                {i < arr.length - 1 && <span style={{ color: 'var(--border-soft)', marginLeft: 7 }}>·</span>}
+                <span style={{ fontFamily: mono ? 'monospace' : 'inherit', color: 'var(--text-3)' }}>{value}</span>
+                {i < arr.length - 1 && <span style={{ color: 'var(--border-soft)', marginLeft: 8 }}>·</span>}
               </span>
             ))}
           </div>
