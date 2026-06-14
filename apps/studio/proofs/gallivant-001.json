@@ -1,0 +1,39 @@
+{
+  "invoiceId": "gallivant-001",
+  "companyName": "Gallivant Ice Cream",
+  "invoiceAmount": "$50,000 · Walmart Net-30",
+  "compliant": true,
+  "score": 82,
+  "approved": true,
+  "confidence": 91,
+  "dairyPrice": 2.34,
+  "txHash": "—",
+  "signature": "—",
+  "timestamp": "2026-06-14T00:00:00Z",
+  "prover": "CRE / BFT Consensus",
+  "consensus": {
+    "agreed": 7,
+    "total": 9
+  },
+  "blockNumber": 0,
+  "steps": [
+    {
+      "label": "Compliance Check",
+      "badge": "🧩 Offchain API",
+      "status": "pending",
+      "metadata": ""
+    },
+    {
+      "label": "Dairy Price Oracle",
+      "badge": "💰 X402 Payment",
+      "status": "pending",
+      "metadata": ""
+    },
+    {
+      "label": "Underwriting Decision",
+      "badge": "🧩 Offchain API",
+      "status": "pending",
+      "metadata": ""
+    }
+  ]
+}

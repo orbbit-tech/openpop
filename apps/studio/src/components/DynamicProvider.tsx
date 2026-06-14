@@ -16,8 +16,8 @@ const arcTestnet = {
   name: 'Arc Testnet',
   nativeCurrency: {
     decimals: 18,
-    name: 'ETH',
-    symbol: 'ETH',
+    name: 'USDC',
+    symbol: 'USDC',
     iconUrl: 'https://app.dynamic.xyz/assets/networks/eth.svg',
   },
   networkId: 5042002,

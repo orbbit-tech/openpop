@@ -25,19 +25,19 @@ export const MOCK_PROOF: Proof = {
   steps: [
     {
       label: 'Compliance Check',
-      badge: '🌐 Offchain API',
+      badge: '🧩 Offchain API',
       status: 'completed',
       metadata: 'KYC pass · KYB pass · OFAC clear',
     },
     {
       label: 'Dairy Price Fetch',
-      badge: '💸 X402 Payment',
+      badge: '💰 X402 Payment',
       status: 'completed',
       metadata: 'USDA cream $2.13/lb · x402 paid',
     },
     {
       label: 'Underwriting Decision',
-      badge: '🌐 Offchain API',
+      badge: '🧩 Offchain API',
       status: 'completed',
       metadata: 'Score 82 · Confidence 91% · Approved',
     },

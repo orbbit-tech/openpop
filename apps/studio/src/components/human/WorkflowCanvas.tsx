@@ -47,7 +47,7 @@ function CREGroupNodeComponent({ data }: NodeProps) {
             color: 'hsl(28, 75%, 42%)',
           }}
         >
-          Verified Execution Environment
+          🔒 Confidential Execution
         </div>
       </div>
     </div>
@@ -120,13 +120,13 @@ interface Props {
 
 export function WorkflowCanvas({ proof }: Props) {
   const txUrl = `${ARC_EXPLORER}/tx/${proof.txHash}`
+  const prefetch = proof.prefetchSteps ?? []
 
-  // Correct group height: last step's bottom + bottom padding
-  const groupH = GROUP_PAD_TOP + (proof.steps.length - 1) * GROUP_STEP_GAP + NODE_H + GROUP_PAD_BOT
-
-  // Vertical positions (all root nodes at x=0, centered via nodeOrigin [0.5, 0])
+  // Vertical layout
   const TRIGGER_Y = 0
-  const GROUP_Y = NODE_H + 48
+  const PREFETCH_GAP = NODE_H + 24
+  const GROUP_Y = NODE_H + 48 + prefetch.length * PREFETCH_GAP
+  const groupH = GROUP_PAD_TOP + (proof.steps.length - 1) * GROUP_STEP_GAP + NODE_H + GROUP_PAD_BOT
   const SIG_Y = GROUP_Y + groupH + 36
   const USDC_Y = SIG_Y + NODE_H + 24
 
@@ -135,12 +135,19 @@ export function WorkflowCanvas({ proof }: Props) {
       id: 'trigger',
       type: 'proofNode',
       position: { x: 0, y: TRIGGER_Y },
-      data: {
-        label: 'Invoice Submitted',
-        badge: 'Trigger',
-        status: 'completed',
-      },
+      data: { label: 'Invoice Submitted', badge: 'Trigger', status: 'completed' },
     },
+    // Pre-CRE steps (e.g. x402 dairy price fetch) — rendered outside the Confidential Execution box
+    ...prefetch.map((step, i) => ({
+      id: `prefetch-${i}`,
+      type: 'proofNode',
+      position: { x: 0, y: NODE_H + 48 + i * PREFETCH_GAP },
+      data: {
+        label: step.label,
+        badge: step.status === 'completed' ? (step.badge ?? 'Done') : step.status === 'failed' ? 'Failed' : 'Pending',
+        status: step.status,
+      },
+    })),
     {
       id: 'cre-group',
       type: 'creGroup',
@@ -153,7 +160,6 @@ export function WorkflowCanvas({ proof }: Props) {
       type: 'proofNode',
       parentId: 'cre-group',
       extent: 'parent' as const,
-      // center child within group — nodeOrigin [0.5, 0] applies here too
       position: { x: GROUP_W / 2, y: GROUP_PAD_TOP + i * GROUP_STEP_GAP },
       data: {
         label: step.label,
@@ -161,7 +167,6 @@ export function WorkflowCanvas({ proof }: Props) {
             ? (step.badge ?? 'Attested')
             : step.status === 'failed' ? 'Failed' : 'Pending',
         status: step.status,
-        // no href — CRE steps don't have individual on-chain records; all 3 share one report
       },
     })),
     {
@@ -171,8 +176,8 @@ export function WorkflowCanvas({ proof }: Props) {
       data: {
         label: 'Execution Proof Verified',
         badge: 'On-Chain',
-        status: 'on-chain',
-        href: txUrl,
+        status: proof.txHash && proof.txHash !== '—' ? 'on-chain' : 'pending',
+        href: proof.txHash && proof.txHash !== '—' ? txUrl : undefined,
       },
     },
     {
@@ -181,20 +186,38 @@ export function WorkflowCanvas({ proof }: Props) {
       position: { x: 0, y: USDC_Y },
       data: {
         label: 'USDC Released from Escrow',
-        badge: 'Released',
-        status: 'released',
-        href: txUrl,
+        badge: proof.approved ? 'Released' : proof.txHash && proof.txHash !== '—' ? 'Rejected' : undefined,
+        status: proof.approved && proof.txHash && proof.txHash !== '—'
+          ? 'released'
+          : proof.txHash && proof.txHash !== '—' && !proof.approved
+            ? 'failed'
+            : 'pending',
+        href: proof.txHash && proof.txHash !== '—' ? txUrl : undefined,
       },
     },
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [proof, txUrl, groupH, GROUP_Y, SIG_Y, USDC_Y])
+  ], [proof, txUrl, groupH, GROUP_Y, SIG_Y, USDC_Y, prefetch])
 
   const edges: Edge[] = useMemo(() => {
+    const hasProof = !!(proof.txHash && proof.txHash !== '—')
     const soft = { stroke: 'hsla(180, 85%, 32%, 0.28)', strokeWidth: 1.5 }
     const dashed = { ...soft, strokeDasharray: '4 3' }
+    const muted = { stroke: 'hsla(220, 14%, 70%, 0.4)', strokeWidth: 1.5, strokeDasharray: '4 3' }
+
+    // trigger → prefetch-0 → ... → prefetch-N → step-0
+    const firstCRETarget = prefetch.length > 0 ? 'prefetch-0' : 'step-0'
+    const lastPrefetchSource = prefetch.length > 0 ? `prefetch-${prefetch.length - 1}` : null
 
     return [
-      { id: 'e-0', source: 'trigger', target: 'step-0', type: 'smoothstep', style: soft },
+      { id: 'e-0', source: 'trigger', target: firstCRETarget, type: 'smoothstep', style: soft },
+      ...prefetch.slice(1).map((_, i) => ({
+        id: `e-prefetch-${i}`,
+        source: `prefetch-${i}`,
+        target: `prefetch-${i + 1}`,
+        type: 'smoothstep',
+        style: soft,
+      })),
+      ...(lastPrefetchSource ? [{ id: 'e-prefetch-cre', source: lastPrefetchSource, target: 'step-0', type: 'smoothstep', style: soft }] : []),
       ...proof.steps.slice(1).map((_, i) => ({
         id: `e-step-${i}`,
         source: `step-${i}`,
@@ -202,10 +225,10 @@ export function WorkflowCanvas({ proof }: Props) {
         type: 'smoothstep',
         style: soft,
       })),
-      { id: 'e-exit', source: `step-${proof.steps.length - 1}`, target: 'sig-verified', type: 'smoothstep', style: dashed },
-      { id: 'e-z2', source: 'sig-verified', target: 'usdc-released', type: 'smoothstep', style: soft },
+      { id: 'e-exit', source: `step-${proof.steps.length - 1}`, target: 'sig-verified', type: 'smoothstep', style: hasProof ? dashed : muted },
+      { id: 'e-z2', source: 'sig-verified', target: 'usdc-released', type: 'smoothstep', style: hasProof ? soft : muted },
     ]
-  }, [proof])
+  }, [proof, prefetch])
 
   return (
     <div

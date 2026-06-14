@@ -1,89 +1,57 @@
 'use client'
 
 import { useDynamicContext } from '@dynamic-labs/sdk-react-core'
-import { Sheet, SheetContent } from '@/components/ui/sheet'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+
 import { OtpSignIn } from './OtpSignIn'
 import { EscrowDeposit } from './EscrowDeposit'
 
 interface Props {
   open: boolean
   onClose: () => void
+  invoiceId?: string
+  onDeposited?: (dealId: bigint) => void
 }
 
-export function InvestSheet({ open, onClose }: Props) {
+const cardStyle: React.CSSProperties = {
+  background: '#fff',
+  border: '1px solid rgba(0,0,0,0.08)',
+  borderRadius: 12,
+  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.07), 0 10px 40px -4px rgba(0,0,0,0.12)',
+  position: 'relative',
+}
+
+const closeBtnStyle: React.CSSProperties = {
+  position: 'absolute',
+  top: 12,
+  right: 12,
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  color: '#94a3b8',
+  fontSize: 16,
+  lineHeight: 1,
+  padding: '4px 6px',
+  borderRadius: 6,
+  fontFamily: 'inherit',
+}
+
+export function InvestSheet({ open, onClose, invoiceId = 'gallivant-001', onDeposited }: Props) {
   const { user } = useDynamicContext()
 
   return (
-    <Sheet open={open} onOpenChange={(isOpen: boolean) => { if (!isOpen) onClose() }}>
-      <SheetContent
-        side="right"
-        showCloseButton={false}
-        className="p-0 border-0 w-full overflow-hidden"
-        style={{ background: '#121212', borderLeft: '1px solid hsl(215, 14%, 22%)', maxWidth: 760 }}
-      >
-        {/* Header */}
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '14px 20px 12px',
-            borderBottom: '1px solid hsl(215, 14%, 22%)',
-            flexShrink: 0,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase' as const,
-              background: 'linear-gradient(to right, hsl(180,85%,47%), hsl(180,85%,39%))',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              backgroundClip: 'text',
-            }}
-          >
-            Invest
-          </span>
-          <button
-            onClick={onClose}
-            style={{
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'hsl(215, 14%, 47%)',
-              fontSize: 13,
-              padding: '2px 4px',
-              borderRadius: 4,
-              fontFamily: 'inherit',
-            }}
-            aria-label="Close"
-          >
-            ✕
-          </button>
+    <Dialog open={open} onOpenChange={(isOpen: boolean) => { if (!isOpen) onClose() }}>
+      <DialogContent>
+        <div style={cardStyle}>
+          <button onClick={onClose} aria-label="Close" style={closeBtnStyle}>✕</button>
+          <div style={{ padding: 28 }}>
+            {!user
+              ? <OtpSignIn onSuccess={() => {}} />
+              : <EscrowDeposit invoiceId={invoiceId} onDeposited={onDeposited} />
+            }
+          </div>
         </div>
-
-        {/* Body */}
-        <div
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: '16px 20px 32px',
-            display: 'flex',
-            flexDirection: 'column' as const,
-            gap: 24,
-            scrollbarWidth: 'thin' as const,
-            scrollbarColor: 'hsl(215, 14%, 22%) transparent',
-          }}
-        >
-          {!user ? (
-            <OtpSignIn onSuccess={() => {}} />
-          ) : (
-            <EscrowDeposit />
-          )}
-        </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   )
 }

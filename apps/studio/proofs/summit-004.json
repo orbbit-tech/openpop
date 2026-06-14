@@ -1,0 +1,47 @@
+{
+  "invoiceId": "summit-004",
+  "companyName": "Summit Valley Farms",
+  "invoiceAmount": "$25,000 \u00b7 Costco Net-60",
+  "compliant": true,
+  "score": 64,
+  "approved": true,
+  "confidence": 72,
+  "dairyPrice": 2.38,
+  "txHash": "\u2014",
+  "signature": "\u2014",
+  "timestamp": "2026-06-13T08:00:00Z",
+  "prover": "CRE / BFT Consensus",
+  "consensus": {
+    "agreed": 7,
+    "total": 9
+  },
+  "blockNumber": 0,
+  "steps": [
+    {
+      "label": "Compliance Check",
+      "badge": "\ud83e\udde9 Offchain API",
+      "status": "completed",
+      "metadata": "KYC pass \u00b7 KYB pass \u00b7 OFAC clear"
+    },
+    {
+      "label": "Dairy Price Oracle",
+      "badge": "\ud83d\udcb0 X402 Payment",
+      "status": "completed",
+      "metadata": "USDA cream $2.38/lb \u00b7 x402 paid"
+    },
+    {
+      "label": "Underwriting Decision",
+      "badge": "\ud83e\udde9 Offchain API",
+      "status": "completed",
+      "metadata": "Score 64 \u00b7 Confidence 72% \u00b7 Approved"
+    }
+  ],
+  "prefetchSteps": [
+    {
+      "label": "Dairy Price Fetch",
+      "badge": "\ud83d\udccb Mock Price",
+      "status": "completed",
+      "metadata": "USDA cream $2.38/lb \u00b7 mock config value"
+    }
+  ]
+}

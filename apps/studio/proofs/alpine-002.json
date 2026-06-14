@@ -1,0 +1,47 @@
+{
+  "invoiceId": "alpine-002",
+  "companyName": "Alpine Creamery Co.",
+  "invoiceAmount": "$38,000 \u00b7 Whole Foods Net-45",
+  "compliant": true,
+  "score": 78,
+  "approved": true,
+  "confidence": 87,
+  "dairyPrice": 2.41,
+  "txHash": "\u2014",
+  "signature": "\u2014",
+  "timestamp": "2026-06-11T09:15:00Z",
+  "prover": "CRE / BFT Consensus",
+  "consensus": {
+    "agreed": 8,
+    "total": 9
+  },
+  "blockNumber": 0,
+  "steps": [
+    {
+      "label": "Compliance Check",
+      "badge": "\ud83e\udde9 Offchain API",
+      "status": "completed",
+      "metadata": "KYC pass \u00b7 KYB pass \u00b7 OFAC clear"
+    },
+    {
+      "label": "Dairy Price Oracle",
+      "badge": "\ud83d\udcb0 X402 Payment",
+      "status": "completed",
+      "metadata": "USDA cream $2.41/lb \u00b7 x402 paid"
+    },
+    {
+      "label": "Underwriting Decision",
+      "badge": "\ud83e\udde9 Offchain API",
+      "status": "completed",
+      "metadata": "Score 78 \u00b7 Confidence 87% \u00b7 Approved"
+    }
+  ],
+  "prefetchSteps": [
+    {
+      "label": "Dairy Price Fetch",
+      "badge": "\ud83d\udccb Mock Price",
+      "status": "completed",
+      "metadata": "USDA cream $2.41/lb \u00b7 mock config value"
+    }
+  ]
+}
