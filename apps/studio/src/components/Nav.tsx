@@ -44,6 +44,28 @@ export function Nav({ onOpen, txHash }: NavProps) {
         </a>
       </div>
 
+      {/* Center: environment badges */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        {[
+          { label: 'CRE Simulated', bg: 'hsl(38, 90%, 96%)', border: 'hsl(38, 80%, 82%)', color: 'hsl(38, 70%, 38%)' },
+          { label: 'Arc Testnet', bg: 'hsla(180, 85%, 32%, 0.06)', border: 'hsla(180, 85%, 32%, 0.2)', color: 'var(--teal)' },
+        ].map(({ label, bg, border, color }) => (
+          <span key={label} style={{
+            padding: '2px 8px',
+            borderRadius: 100,
+            fontSize: 9,
+            fontWeight: 600,
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase' as const,
+            background: bg,
+            border: `1px solid ${border}`,
+            color,
+          }}>
+            {label}
+          </span>
+        ))}
+      </div>
+
       {/* Right: optional For Agents button + optional on-chain link */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {onOpen && (
