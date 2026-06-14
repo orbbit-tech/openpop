@@ -8,6 +8,20 @@
 
 **Best for:** workflows with private inputs and a counterparty who needs to trust the output.
 
+### Demos
+
+OpenPop verifiable workflow 
+
+https://youtu.be/lS5N3-kqoGE
+
+OpenPop MCP
+
+https://youtu.be/-wDAQe2TOuE
+
+OpenPop CRE workflow run
+
+https://youtu.be/Wh8rcqJCsk8
+
 
 ## Why
 
