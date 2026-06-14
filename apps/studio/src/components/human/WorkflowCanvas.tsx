@@ -6,39 +6,89 @@ import '@xyflow/react/dist/style.css'
 import { ProofNode } from './ProofNode'
 import type { Proof } from '@/types/proof'
 
-// Zone boundary node — renders as a visual bridge between CRE TEE and Arc Testnet
+const ARC_EXPLORER = 'https://testnet.arcscan.app'
+
+// CRE TEE group container — visual box only, no handles, children are real nodes
+function CREGroupNodeComponent({ data }: NodeProps) {
+  const d = data as { execShort?: string }
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        border: '1.5px dashed hsl(180, 45%, 68%)',
+        borderRadius: 12,
+        background: 'hsl(180, 70%, 99.2%)',
+        position: 'relative',
+        pointerEvents: 'none',
+      }}
+    >
+      {/* Top-right label */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 10,
+          right: 12,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: 3,
+        }}
+      >
+        <div
+          style={{
+            padding: '2px 7px',
+            background: 'hsl(180, 85%, 96%)',
+            border: '1px solid hsl(180, 85%, 84%)',
+            borderRadius: 4,
+            fontSize: 8,
+            fontWeight: 700,
+            letterSpacing: '0.1em',
+            textTransform: 'uppercase' as const,
+            color: 'var(--teal)',
+          }}
+        >
+          CRE · TEE
+        </div>
+        {d.execShort && (
+          <span style={{ fontSize: 8, color: 'hsl(180, 40%, 60%)', fontFamily: 'monospace' }}>
+            {d.execShort}
+          </span>
+        )}
+      </div>
+    </div>
+  )
+}
+
+const CREGroupNode = memo(CREGroupNodeComponent)
+
+// Zone boundary node — bridge between CRE TEE and Arc Testnet
 function ZoneBoundaryNodeComponent({ data }: NodeProps) {
   const d = data as { consensus: string; txShort: string }
   return (
-    <div style={{ width: 340, position: 'relative' }}>
+    <div style={{ width: 320, position: 'relative' }}>
       <Handle type="target" position={Position.Top} style={{ opacity: 0, pointerEvents: 'none' }} />
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '8px 14px',
+          padding: '7px 14px',
           background: 'linear-gradient(90deg, hsl(180, 60%, 97%) 0%, hsl(240, 60%, 97%) 100%)',
           border: '1px dashed hsl(220, 30%, 80%)',
           borderRadius: 8,
-          gap: 12,
+          gap: 10,
         }}
       >
-        {/* Left: CRE consensus summary */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           <div
             style={{
-              width: 16,
-              height: 16,
-              borderRadius: '50%',
+              width: 15, height: 15, borderRadius: '50%',
               background: 'var(--teal)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
             }}
           >
-            <svg width="9" height="9" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="8" height="8" viewBox="0 0 16 16" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="2,8 6,12 14,4" />
             </svg>
           </div>
@@ -47,30 +97,23 @@ function ZoneBoundaryNodeComponent({ data }: NodeProps) {
           </span>
         </div>
 
-        {/* Arrow */}
-        <svg width="18" height="10" viewBox="0 0 18 10" fill="none" style={{ flexShrink: 0 }}>
-          <line x1="0" y1="5" x2="13" y2="5" stroke="hsl(220, 30%, 72%)" strokeWidth="1.5" />
-          <polyline points="10,2 13,5 10,8" stroke="hsl(220, 30%, 72%)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+        <svg width="16" height="8" viewBox="0 0 16 8" fill="none" style={{ flexShrink: 0 }}>
+          <line x1="0" y1="4" x2="11" y2="4" stroke="hsl(220, 30%, 72%)" strokeWidth="1.5" />
+          <polyline points="8,1.5 11,4 8,6.5" stroke="hsl(220, 30%, 72%)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </svg>
 
-        {/* Right: Arc Testnet label */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0 }}>
           <div
             style={{
-              padding: '2px 7px',
-              borderRadius: 100,
-              background: 'hsl(240, 60%, 97%)',
-              border: '1px solid hsl(240, 60%, 82%)',
-              fontSize: 9,
-              fontWeight: 700,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase' as const,
-              color: 'hsl(240, 60%, 44%)',
+              padding: '2px 6px', borderRadius: 100,
+              background: 'hsl(240, 60%, 97%)', border: '1px solid hsl(240, 60%, 82%)',
+              fontSize: 8, fontWeight: 700, letterSpacing: '0.08em',
+              textTransform: 'uppercase' as const, color: 'hsl(240, 60%, 44%)',
             }}
           >
             Arc Testnet
           </div>
-          <span style={{ fontSize: 9, color: 'hsl(240, 40%, 58%)', fontFamily: 'monospace' }}>
+          <span style={{ fontSize: 8, color: 'hsl(240, 40%, 58%)', fontFamily: 'monospace' }}>
             {d.txShort}
           </span>
         </div>
@@ -84,17 +127,31 @@ const ZoneBoundaryNode = memo(ZoneBoundaryNodeComponent)
 
 const nodeTypes: NodeTypes = {
   proofNode: ProofNode,
+  creGroup: CREGroupNode,
   zoneBoundary: ZoneBoundaryNode,
 }
+
+const GROUP_W = 290
+const GROUP_STEP_GAP = 100  // vertical spacing between child nodes
+const GROUP_PAD_TOP = 44    // room for the CRE · TEE label
+const GROUP_PAD_BOT = 24
+const NODE_H = 66           // approximate ProofNode height
 
 interface Props {
   proof: Proof
 }
 
 export function WorkflowCanvas({ proof }: Props) {
+  const txUrl = `${ARC_EXPLORER}/tx/${proof.txHash}`
+  const txLogsUrl = `${txUrl}?tab=logs`
+
   const txShort = proof.txHash.startsWith('0x')
     ? `${proof.txHash.slice(0, 8)}…${proof.txHash.slice(-4)}`
     : proof.txHash
+
+  const execShort = proof.workflowExecutionId
+    ? `${proof.workflowExecutionId.slice(0, 8)}…${proof.workflowExecutionId.slice(-4)}`
+    : undefined
 
   const usdcAmount = proof.usdcReleasedAmount
     ? `${(proof.usdcReleasedAmount / 1_000_000).toFixed(0)} USDC`
@@ -104,119 +161,134 @@ export function WorkflowCanvas({ proof }: Props) {
     ? `${proof.recipient.slice(0, 6)}…${proof.recipient.slice(-4)}`
     : '—'
 
-  const nodes: Node[] = useMemo(() => {
-    const zoneY = 110 * (proof.steps.length + 1) + 20 // extra gap before zone boundary
-    const zone2Start = zoneY + 100
+  // Group height: top pad + steps * gap + last node height + bottom pad
+  const groupH = GROUP_PAD_TOP + proof.steps.length * GROUP_STEP_GAP + NODE_H + GROUP_PAD_BOT
 
-    return [
-      // — Zone 1: CRE TEE —
-      {
-        id: 'trigger',
-        type: 'proofNode',
-        position: { x: 0, y: 0 },
-        data: {
-          label: 'Invoice Submitted',
-          meta: `${proof.companyName} · ${proof.invoiceAmount}`,
-          badge: 'Trigger',
-          status: 'completed',
-        },
-      },
-      ...proof.steps.map((step, i) => ({
-        id: `step-${i}`,
-        type: 'proofNode',
-        position: { x: 0, y: 110 * (i + 1) },
-        data: {
-          label: step.label,
-          meta: step.metadata,
-          badge: step.status === 'completed' ? 'Attested' : step.status === 'failed' ? 'Failed' : 'Pending',
-          status: step.status,
-        },
-      })),
+  // Vertical layout (all root nodes centered at x=0 with nodeOrigin [0.5, 0])
+  const TRIGGER_Y = 0
+  const GROUP_Y = NODE_H + 50          // below trigger
+  const BOUNDARY_Y = GROUP_Y + groupH + 40
+  const SIG_Y = BOUNDARY_Y + 46
+  const USDC_Y = SIG_Y + NODE_H + 28
 
-      // — Zone boundary —
-      {
-        id: 'zone-boundary',
-        type: 'zoneBoundary',
-        position: { x: -40, y: zoneY },
-        data: {
-          consensus: `${proof.consensus.agreed}/${proof.consensus.total} nodes`,
-          txShort,
-        },
+  const nodes: Node[] = useMemo(() => [
+    // — Trigger (outside the group) —
+    {
+      id: 'trigger',
+      type: 'proofNode',
+      position: { x: 0, y: TRIGGER_Y },
+      data: {
+        label: 'Invoice Submitted',
+        meta: `${proof.companyName} · ${proof.invoiceAmount}`,
+        badge: 'Trigger',
+        status: 'completed',
       },
+    },
 
-      // — Zone 2: Arc Testnet (single tx, two events) —
-      {
-        id: 'sig-verified',
-        type: 'proofNode',
-        position: { x: 0, y: zone2Start },
-        data: {
-          label: 'Signature Verified',
-          meta: proof.workflowExecutionId
-            ? `Report ${proof.reportId ?? '—'} · exec ${proof.workflowExecutionId.slice(0, 8)}…${proof.workflowExecutionId.slice(-4)}`
-            : 'MockKeystoneForwarder · BFT report accepted',
-          badge: 'On-Chain',
-          status: 'on-chain',
-        },
+    // — CRE TEE group container —
+    {
+      id: 'cre-group',
+      type: 'creGroup',
+      position: { x: 0, y: GROUP_Y },
+      data: { execShort },
+      style: { width: GROUP_W, height: groupH },
+    },
+
+    // — Child nodes inside group (positions relative to group top-left) —
+    ...proof.steps.map((step, i) => ({
+      id: `step-${i}`,
+      type: 'proofNode',
+      parentId: 'cre-group',
+      extent: 'parent' as const,
+      // Center child (240px wide) within group (GROUP_W px wide), nodeOrigin [0.5,0]
+      position: { x: GROUP_W / 2, y: GROUP_PAD_TOP + i * GROUP_STEP_GAP },
+      data: {
+        label: step.label,
+        meta: step.metadata,
+        badge: step.status === 'completed' ? 'Attested' : step.status === 'failed' ? 'Failed' : 'Pending',
+        status: step.status,
+        href: txLogsUrl,
       },
-      {
-        id: 'usdc-released',
-        type: 'proofNode',
-        position: { x: 0, y: zone2Start + 110 },
-        data: {
-          label: 'USDC Released',
-          meta: `${usdcAmount} → ${recipientShort} · ProofGatedEscrow`,
-          badge: 'Released',
-          status: 'released',
-        },
+    })),
+
+    // — Zone boundary bridge —
+    {
+      id: 'zone-boundary',
+      type: 'zoneBoundary',
+      position: { x: 0, y: BOUNDARY_Y },
+      data: {
+        consensus: `${proof.consensus.agreed}/${proof.consensus.total} nodes`,
+        txShort,
       },
-    ]
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [proof, txShort, usdcAmount, recipientShort])
+    },
+
+    // — Zone 2: Arc Testnet events —
+    {
+      id: 'sig-verified',
+      type: 'proofNode',
+      position: { x: 0, y: SIG_Y },
+      data: {
+        label: 'Execution Proof Verified',
+        meta: proof.reportId
+          ? `Report ${proof.reportId} · MockKeystoneForwarder`
+          : 'MockKeystoneForwarder · BFT report accepted',
+        badge: 'On-Chain',
+        status: 'on-chain',
+        href: txUrl,
+      },
+    },
+    {
+      id: 'usdc-released',
+      type: 'proofNode',
+      position: { x: 0, y: USDC_Y },
+      data: {
+        label: 'USDC Released from Escrow',
+        meta: `${usdcAmount} → ${recipientShort} · ProofGatedEscrow`,
+        badge: 'Released',
+        status: 'released',
+        href: txUrl,
+      },
+    },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], [proof, execShort, txLogsUrl, txUrl, txShort, usdcAmount, recipientShort, groupH, GROUP_Y, BOUNDARY_Y, SIG_Y, USDC_Y])
 
   const edges: Edge[] = useMemo(() => {
-    const tealEdge = { stroke: 'hsl(180, 40%, 78%)', strokeWidth: 1.5 }
-    const indigoEdge = { stroke: 'hsl(240, 40%, 78%)', strokeWidth: 1.5 }
+    const teal = { stroke: 'hsl(180, 40%, 72%)', strokeWidth: 1.5 }
+    const indigo = { stroke: 'hsl(240, 40%, 72%)', strokeWidth: 1.5 }
 
-    const zone1Ids = ['trigger', ...proof.steps.map((_, i) => `step-${i}`)]
-    const zone1Edges: Edge[] = zone1Ids.slice(0, -1).map((id, i) => ({
-      id: `e-z1-${i}`,
-      source: id,
-      target: zone1Ids[i + 1],
-      type: 'smoothstep',
-      style: tealEdge,
-    }))
-
-    // Cross-zone edges (dashed)
-    const crossEdges: Edge[] = [
+    return [
+      // trigger → first CRE step (crosses into group)
+      { id: 'e-0', source: 'trigger', target: 'step-0', type: 'smoothstep', style: teal },
+      // steps within group
+      ...proof.steps.slice(1).map((_, i) => ({
+        id: `e-step-${i}`,
+        source: `step-${i}`,
+        target: `step-${i + 1}`,
+        type: 'smoothstep',
+        style: teal,
+      })),
+      // last step → zone boundary (exits group)
       {
-        id: 'e-cross-1',
-        source: zone1Ids[zone1Ids.length - 1],
+        id: 'e-exit',
+        source: `step-${proof.steps.length - 1}`,
         target: 'zone-boundary',
         type: 'smoothstep',
-        style: { ...tealEdge, strokeDasharray: '4 3' },
+        style: { ...teal, strokeDasharray: '4 3' },
       },
+      // zone boundary → sig-verified
       {
-        id: 'e-cross-2',
+        id: 'e-cross',
         source: 'zone-boundary',
         target: 'sig-verified',
         type: 'smoothstep',
-        style: { ...indigoEdge, strokeDasharray: '4 3' },
+        style: { ...indigo, strokeDasharray: '4 3' },
       },
+      // sig-verified → usdc-released
+      { id: 'e-z2', source: 'sig-verified', target: 'usdc-released', type: 'smoothstep', style: indigo },
     ]
-
-    // Zone 2 edge
-    const zone2Edges: Edge[] = [
-      {
-        id: 'e-z2-0',
-        source: 'sig-verified',
-        target: 'usdc-released',
-        type: 'smoothstep',
-        style: indigoEdge,
-      },
-    ]
-
-    return [...zone1Edges, ...crossEdges, ...zone2Edges]
   }, [proof])
+
+  const canvasH = USDC_Y + NODE_H + 80
 
   return (
     <div
@@ -225,7 +297,7 @@ export function WorkflowCanvas({ proof }: Props) {
         border: '1px solid var(--border-soft)',
         borderRadius: 'var(--radius-lg)',
         overflow: 'hidden',
-        height: 820,
+        height: Math.max(canvasH, 680),
       }}
     >
       <ReactFlow
@@ -241,16 +313,13 @@ export function WorkflowCanvas({ proof }: Props) {
         zoomOnPinch={true}
         nodeOrigin={[0.5, 0]}
         fitView
-        fitViewOptions={{ padding: 0.18, maxZoom: 1.1 }}
+        fitViewOptions={{ padding: 0.2, maxZoom: 1.1 }}
         proOptions={{ hideAttribution: true }}
         style={{ background: 'var(--accent-bg)' }}
       >
         <Controls
           showInteractive={false}
-          style={{
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-            border: '1px solid var(--border-soft)',
-          }}
+          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)', border: '1px solid var(--border-soft)' }}
         />
       </ReactFlow>
     </div>
