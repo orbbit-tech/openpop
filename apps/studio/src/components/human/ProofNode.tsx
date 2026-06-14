@@ -7,31 +7,72 @@ type ProofNodeData = {
   label: string
   meta?: string
   badge?: string
-  status: 'completed' | 'pending' | 'failed'
+  status: 'completed' | 'pending' | 'failed' | 'attested' | 'on-chain' | 'released'
 }
 
 function ProofNodeComponent({ data }: NodeProps) {
   const d = data as unknown as ProofNodeData
-  const isCompleted = d.status === 'completed'
-  const isFailed = d.status === 'failed'
 
-  const iconColor = isCompleted ? 'var(--teal)' : isFailed ? 'hsl(0, 72%, 51%)' : 'var(--text-3)'
-  const iconBg = isCompleted
+  const isCompleted = d.status === 'completed' || d.status === 'attested'
+  const isFailed = d.status === 'failed'
+  const isOnChain = d.status === 'on-chain'
+  const isReleased = d.status === 'released'
+  const isPending = d.status === 'pending'
+  const showBadge = d.badge && !isPending && !isFailed
+
+  const iconColor = isOnChain
+    ? 'hsl(240, 60%, 52%)'
+    : isReleased
+    ? 'hsl(142, 60%, 38%)'
+    : isCompleted
+    ? 'var(--teal)'
+    : isFailed
+    ? 'hsl(0, 72%, 51%)'
+    : 'var(--text-3)'
+
+  const iconBg = isOnChain
+    ? 'hsl(240, 60%, 97%)'
+    : isReleased
+    ? 'hsl(142, 60%, 95%)'
+    : isCompleted
     ? 'hsl(180, 85%, 97%)'
     : isFailed
     ? 'hsl(0, 72%, 97%)'
     : 'var(--accent-bg)'
-  const iconBorder = isCompleted
+
+  const iconBorder = isOnChain
+    ? 'hsl(240, 60%, 88%)'
+    : isReleased
+    ? 'hsl(142, 60%, 82%)'
+    : isCompleted
     ? 'hsl(180, 85%, 88%)'
     : isFailed
     ? 'hsl(0, 72%, 88%)'
     : 'var(--border-soft)'
 
+  const badgeBg = isOnChain
+    ? 'hsl(240, 60%, 97%)'
+    : isReleased
+    ? 'hsl(142, 60%, 95%)'
+    : 'hsl(180, 85%, 97%)'
+
+  const badgeBorder = isOnChain
+    ? 'hsl(240, 60%, 82%)'
+    : isReleased
+    ? 'hsl(142, 60%, 78%)'
+    : 'hsl(180, 85%, 85%)'
+
+  const badgeColor = isOnChain
+    ? 'hsl(240, 60%, 44%)'
+    : isReleased
+    ? 'hsl(142, 60%, 30%)'
+    : 'var(--teal)'
+
   return (
     <div
       style={{
         background: 'var(--surface)',
-        border: '1px solid var(--border-soft)',
+        border: `1px solid ${isOnChain || isReleased ? iconBorder : 'var(--border-soft)'}`,
         borderRadius: 8,
         padding: '12px 14px',
         width: 260,
@@ -61,6 +102,19 @@ function ProofNodeComponent({ data }: NodeProps) {
           {isCompleted ? (
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="2,8 6,12 14,4" />
+            </svg>
+          ) : isOnChain ? (
+            // Shield / signature verified icon
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 2L3 4.5V8c0 3 2.5 4.8 5 5.5 2.5-.7 5-2.5 5-5.5V4.5L8 2z" />
+              <polyline points="5.5,8 7,9.5 10.5,6" />
+            </svg>
+          ) : isReleased ? (
+            // Arrow right / transfer icon
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="2" y1="8" x2="12" y2="8" />
+              <polyline points="9,5 12,8 9,11" />
+              <line x1="14" y1="5" x2="14" y2="11" />
             </svg>
           ) : isFailed ? (
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -103,19 +157,19 @@ function ProofNodeComponent({ data }: NodeProps) {
         </div>
 
         {/* Badge */}
-        {d.badge && isCompleted && (
+        {showBadge && (
           <div
             style={{
               flexShrink: 0,
-              background: 'hsl(180, 85%, 97%)',
-              border: '1px solid hsl(180, 85%, 85%)',
+              background: badgeBg,
+              border: `1px solid ${badgeBorder}`,
               borderRadius: 100,
               padding: '2px 7px',
               fontSize: 9,
               fontWeight: 700,
               letterSpacing: '0.06em',
               textTransform: 'uppercase' as const,
-              color: 'var(--teal)',
+              color: badgeColor,
             }}
           >
             {d.badge}

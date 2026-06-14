@@ -14,6 +14,8 @@ export const MOCK_PROOF: Proof = {
   prover: 'CRE / BFT Consensus',
   consensus: { agreed: 7, total: 9 },
   blockNumber: 47005738,
+  usdcReleasedAmount: 5000000,
+  recipient: '0xbc10268a5ca8287bbad5aaf4667c056f35412ea4',
   steps: [
     {
       label: 'Compliance Check',
