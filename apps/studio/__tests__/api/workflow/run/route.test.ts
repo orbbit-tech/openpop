@@ -7,17 +7,47 @@ import type { Receipt } from '../../../../src/types/receipt'
 vi.mock('node:child_process')
 vi.mock('node:fs')
 
+vi.mock('x402-fetch', () => ({
+  wrapFetchWithPayment: (_fetch: unknown, _wallet: unknown) =>
+    (_url: string) => Promise.resolve({ ok: true, json: () => Promise.resolve({ price: 2.34, unit: 'USD/lb' }) }),
+}))
+
+vi.mock('viem', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('viem')>()
+  return {
+    ...actual,
+    createWalletClient: () => ({}),
+    http: () => ({}),
+  }
+})
+
+vi.mock('viem/accounts', () => ({
+  privateKeyToAccount: () => ({ address: '0x0000000000000000000000000000000000000001' }),
+}))
+
+vi.mock('viem/chains', () => ({
+  baseSepolia: { id: 84532 },
+}))
+
 const { POST } = await import('../../../../src/app/api/workflow/run/route')
+
+// ── helpers ───────────────────────────────────────────────────────────────────
+
+/** Wrap a CRE result object in the prose stdout format the route parses. */
+function makeCREStdout(result: object): string {
+  return `✓ Workflow Simulation Result:\n${JSON.stringify(JSON.stringify(result))}`
+}
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
 
 const creResult = {
   invoiceId: 'INV-001',
   businessName: 'Gallivant Ice Cream',
-  compliance: { kyc: 'pass', kyb: 'pass', sanctions: 'clean' },
+  compliance: { kyc: 'pass', kyb: 'pass', sanctions: 'clear' },
   dairyPrice: { price: 2.34, unit: 'per lb' },
   underwriting: { score: 82, approved: true, maxAdvanceUsdc: 42500 },
   verdict: 'approved',
+  txHash: null,
   timestamp: '2026-06-13T14:32:00Z',
 }
 
@@ -54,29 +84,31 @@ function makeRequest(): NextRequest {
 describe('POST /api/workflow/run', () => {
   beforeEach(() => {
     vi.resetAllMocks()
+    process.env.X402_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001'
+    process.env.DAIRY_API_URL = 'https://g78md4c7ke.execute-api.us-east-1.amazonaws.com/dairy/cream/price'
   })
 
   it('CRE exits 0 → returns 200 with Receipt shaped from CRE stdout', async () => {
-    vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: JSON.stringify(creResult) } as any)
+    vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: makeCREStdout(creResult) } as any)
 
     const res = await POST(makeRequest())
     const body = await res.json()
 
     expect(res.status).toBe(200)
-    expect(body.receipt.companyName).toBe('Gallivant Ice Cream')
-    expect(body.receipt.dairyPrice).toBe(2.34)
-    expect(body.receipt.score).toBe(82)
-    expect(body.receipt.approved).toBe(true)
+    expect(body.companyName).toBe('Gallivant Ice Cream')
+    expect(body.dairyPrice).toBe(2.34)
+    expect(body.score).toBe(82)
+    expect(body.approved).toBe(true)
   })
 
   it('compliant is true when kyc=pass, kyb=pass, sanctions=clean', async () => {
-    vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: JSON.stringify(creResult) } as any)
+    vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: makeCREStdout(creResult) } as any)
 
     const res = await POST(makeRequest())
     const body = await res.json()
 
     expect(res.status).toBe(200)
-    expect(body.receipt.compliant).toBe(true)
+    expect(body.compliant).toBe(true)
   })
 
   it('compliant is false when any compliance field deviates from passing value', async () => {
@@ -84,13 +116,13 @@ describe('POST /api/workflow/run', () => {
       ...creResult,
       compliance: { kyc: 'fail', kyb: 'pass', sanctions: 'clean' },
     }
-    vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: JSON.stringify(failingResult) } as any)
+    vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: makeCREStdout(failingResult) } as any)
 
     const res = await POST(makeRequest())
     const body = await res.json()
 
     expect(res.status).toBe(200)
-    expect(body.receipt.compliant).toBe(false)
+    expect(body.compliant).toBe(false)
   })
 
   it('approved reflects underwriting.approved from CRE stdout', async () => {
@@ -98,13 +130,13 @@ describe('POST /api/workflow/run', () => {
       ...creResult,
       underwriting: { score: 40, approved: false, maxAdvanceUsdc: 0 },
     }
-    vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: JSON.stringify(rejectedResult) } as any)
+    vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: makeCREStdout(rejectedResult) } as any)
 
     const res = await POST(makeRequest())
     const body = await res.json()
 
     expect(res.status).toBe(200)
-    expect(body.receipt.approved).toBe(false)
+    expect(body.approved).toBe(false)
   })
 
   it('CRE exits non-zero → returns 500 and writeFileSync is not called', async () => {

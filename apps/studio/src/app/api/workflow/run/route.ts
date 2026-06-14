@@ -3,6 +3,10 @@ import { spawnSync } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
 import path from 'node:path'
 import type { Proof } from '../../../../types/proof'
+import { wrapFetchWithPayment } from 'x402-fetch'
+import { createWalletClient, http } from 'viem'
+import { baseSepolia } from 'viem/chains'
+import { privateKeyToAccount } from 'viem/accounts'
 
 type CREResult = {
   invoiceId: string
@@ -36,10 +40,23 @@ async function fetchBlockNumber(txHash: string): Promise<number | null> {
 }
 
 export async function POST(_request?: NextRequest): Promise<NextResponse> {
+  const account = privateKeyToAccount(process.env.X402_PRIVATE_KEY as `0x${string}`)
+  const walletClient = createWalletClient({ account, chain: baseSepolia, transport: http() })
+  const fetchWithPayment = wrapFetchWithPayment(fetch, walletClient as Parameters<typeof wrapFetchWithPayment>[1])
+
+  let dairyPrice: { price: number; unit: string }
+  try {
+    const dairyRes = await fetchWithPayment(process.env.DAIRY_API_URL!)
+    dairyPrice = await dairyRes.json() as { price: number; unit: string }
+  } catch {
+    return NextResponse.json({ error: 'Dairy price fetch failed' }, { status: 500 })
+  }
+
   const payload = JSON.stringify({
     invoiceId: 'gallivant-001',
     amount: 50000,
     businessName: 'Gallivant Ice Cream',
+    dairyPriceUsdPerLb: dairyPrice.price,
   })
 
   // cre CLI must run from cre/ (where project.yaml lives), not cre/loan/
