@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { NextRequest } from 'next/server'
 import { readFile } from 'fs/promises'
-import type { Receipt } from '../../../src/types/receipt'
+import type { Proof } from '../../../src/types/proof'
 
 vi.mock('fs/promises')
 
@@ -9,7 +9,7 @@ const { POST } = await import('../../../src/app/api/mcp/route')
 
 // ── fixtures ──────────────────────────────────────────────────────────────────
 
-function buildReceipt(overrides: Partial<Receipt> = {}): Receipt {
+function buildProof(overrides: Partial<Proof> = {}): Proof {
   return {
     companyName: 'Gallivant Ice Cream',
     invoiceAmount: '$50,000 · Walmart Net-30',
@@ -69,7 +69,7 @@ describe('POST /api/mcp', () => {
   })
 
   it('method tools/call with params.name get_proof → returns 200 with content[0].type text containing receipt JSON', async () => {
-    const receipt = buildReceipt()
+    const receipt = buildProof()
     vi.mocked(readFile).mockResolvedValue(JSON.stringify(receipt) as any)
 
     const res = await POST(makeRequest({ jsonrpc: '2.0', method: 'tools/call', id: 3, params: { name: 'get_proof' } }))
