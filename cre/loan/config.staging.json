@@ -6,7 +6,7 @@
   "dairyPriceMockUsdPerLb": 2.13,
   "defaultBusinessName": "SMB",
   "authorizedKeys": [],
-  "consumerAddress": "PROOF_ESCROW_ADDRESS_HERE",
+  "consumerAddress": "0x6aDEB480BB7b7c54bE7Fb80b56E7Cd23fBD30527",
   "dealId": 1,
   "chainSelectorName": "arc-testnet"
 }
