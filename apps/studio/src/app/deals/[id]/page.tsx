@@ -119,39 +119,36 @@ export default function DealDetailPage() {
           {/* Divider */}
           <div style={{ height: 1, background: 'var(--border-soft)' }} />
 
-          {/* Attestation section */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {/* Attestation metadata — all in one row, code font for values */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' as const }}>
-              {/* Tx hash */}
-              <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: 'var(--text-3)' }}>Tx</span>
-                {proof.txHash.startsWith('0x') ? (
-                  <a
-                    href={`${ARC_EXPLORER}/tx/${proof.txHash}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ fontFamily: 'monospace', fontSize: 11, fontWeight: 400, color: 'var(--teal)', textDecoration: 'none' }}
-                  >
-                    {txShort} ↗
-                  </a>
-                ) : (
-                  <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-2)' }}>{txShort}</span>
-                )}
+          {/* Attestation metadata — consistent 11px, label/value differentiated by color */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' as const, fontSize: 11, lineHeight: 1 }}>
+            {/* Tx */}
+            <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ color: 'var(--text-3)' }}>Tx</span>
+              {proof.txHash.startsWith('0x') ? (
+                <a
+                  href={`${ARC_EXPLORER}/tx/${proof.txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontFamily: 'monospace', color: 'var(--teal)', textDecoration: 'none' }}
+                >
+                  {txShort} ↗
+                </a>
+              ) : (
+                <span style={{ fontFamily: 'monospace', color: 'var(--text-2)' }}>{txShort}</span>
+              )}
+            </span>
+            <span style={{ color: 'var(--border-soft)' }}>·</span>
+            {[
+              { label: 'Block', value: proof.blockNumber.toLocaleString(), mono: true },
+              { label: 'Consensus', value: `${proof.consensus.agreed}/${proof.consensus.total} nodes`, mono: false },
+              { label: 'Prover', value: proof.prover, mono: false },
+            ].map(({ label, value, mono }, i, arr) => (
+              <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <span style={{ color: 'var(--text-3)' }}>{label}</span>
+                <span style={{ fontFamily: mono ? 'monospace' : 'inherit', color: 'var(--text-2)' }}>{value}</span>
+                {i < arr.length - 1 && <span style={{ color: 'var(--border-soft)', marginLeft: 7 }}>·</span>}
               </span>
-              <span style={{ color: 'var(--border-soft)' }}>·</span>
-              {[
-                { label: 'Block', value: `Arc ${proof.blockNumber.toLocaleString()}` },
-                { label: 'Consensus', value: `${proof.consensus.agreed}/${proof.consensus.total} nodes` },
-                { label: 'Prover', value: proof.prover },
-              ].map(({ label, value }, i, arr) => (
-                <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' as const, color: 'var(--text-3)' }}>{label}</span>
-                  <span style={{ fontFamily: 'monospace', fontSize: 11, color: 'var(--text-2)' }}>{value}</span>
-                  {i < arr.length - 1 && <span style={{ color: 'var(--border-soft)', marginLeft: 2 }}>·</span>}
-                </span>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
 
