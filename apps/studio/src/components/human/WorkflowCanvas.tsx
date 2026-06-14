@@ -1,69 +1,210 @@
 'use client'
 
-import { useMemo } from 'react'
-import { ReactFlow, Controls, type Node, type Edge, type NodeTypes } from '@xyflow/react'
+import { memo, useMemo } from 'react'
+import { ReactFlow, Controls, Handle, Position, type Node, type Edge, type NodeTypes, type NodeProps } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { ProofNode } from './ProofNode'
 import type { Proof } from '@/types/proof'
 
-const nodeTypes: NodeTypes = { proofNode: ProofNode }
+const ARC_EXPLORER = 'https://testnet.arcscan.app'
+
+// CRE TEE group container — gray dashed box, no handles, no pointer events
+function CREGroupNodeComponent({ data }: NodeProps) {
+  const d = data as { execShort?: string }
+  return (
+    <div
+      style={{
+        width: '100%',
+        height: '100%',
+        border: '1.5px dashed hsla(180, 85%, 32%, 0.22)',
+        borderRadius: 10,
+        background: 'hsla(180, 85%, 32%, 0.03)',
+        position: 'relative',
+        pointerEvents: 'none',
+      }}
+    >
+      {/* Top-right label */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 10,
+          right: 12,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: 3,
+        }}
+      >
+        <div
+          style={{
+            padding: '2px 8px',
+            background: 'hsl(28, 90%, 96%)',
+            border: '1px solid hsl(28, 75%, 80%)',
+            borderRadius: 4,
+            fontSize: 8,
+            fontWeight: 600,
+            letterSpacing: '0.02em',
+            color: 'hsl(28, 75%, 42%)',
+          }}
+        >
+          Verified Execution Environment
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const CREGroupNode = memo(CREGroupNodeComponent)
+
+// Minimal zone boundary — separates off-chain from on-chain
+function ZoneBoundaryNodeComponent({ data }: NodeProps) {
+  const d = data as { consensus: string }
+  return (
+    <div style={{ width: 380, position: 'relative' }}>
+      <Handle type="target" position={Position.Top} style={{ opacity: 0, pointerEvents: 'none' }} />
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '7px 14px',
+          background: 'var(--surface)',
+          border: '1px solid var(--border-soft)',
+          borderRadius: 8,
+          gap: 10,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <div
+            style={{
+              width: 14, height: 14, borderRadius: '50%',
+              background: 'hsl(170, 25%, 94%)',
+              border: '1px solid hsl(170, 25%, 78%)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+            }}
+          >
+            <svg width="7" height="7" viewBox="0 0 16 16" fill="none" stroke="hsl(170, 35%, 42%)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="2,8 6,12 14,4" />
+            </svg>
+          </div>
+          <span style={{ fontSize: 10, fontWeight: 500, color: 'var(--text-2)', letterSpacing: '0.01em' }}>
+            {d.consensus} · BFT report signed
+          </span>
+        </div>
+
+      </div>
+      <Handle type="source" position={Position.Bottom} style={{ opacity: 0, pointerEvents: 'none' }} />
+    </div>
+  )
+}
+
+const ZoneBoundaryNode = memo(ZoneBoundaryNodeComponent)
+
+const nodeTypes: NodeTypes = {
+  proofNode: ProofNode,
+  creGroup: CREGroupNode,
+  zoneBoundary: ZoneBoundaryNode,
+}
+
+const NODE_W = 340           // ProofNode width
+const GROUP_PAD_H = 24       // horizontal padding inside group each side
+const GROUP_W = NODE_W + GROUP_PAD_H * 2  // = 388
+const GROUP_STEP_GAP = 76    // vertical gap between child node tops
+const GROUP_PAD_TOP = 44     // room for CRE · TEE label
+const GROUP_PAD_BOT = 20
+const NODE_H = 52            // node height without subtitle line
 
 interface Props {
   proof: Proof
 }
 
 export function WorkflowCanvas({ proof }: Props) {
-  const nodes: Node[] = useMemo(() => {
-    const baseNodes: Node[] = [
-      {
-        id: 'trigger',
-        type: 'proofNode',
-        position: { x: 0, y: 0 },
-        data: {
-          label: 'Invoice Submitted',
-          meta: `${proof.companyName} · ${proof.invoiceAmount}`,
-          badge: 'Trigger',
-          status: 'completed',
-        },
-      },
-    ]
+  const txUrl = `${ARC_EXPLORER}/tx/${proof.txHash}`
 
-    const stepNodes: Node[] = proof.steps.map((step, i) => ({
-      id: `step-${i}`,
-      type: 'proofNode',
-      position: { x: 0, y: 110 * (i + 1) },
-      data: {
-        label: step.label,
-        meta: step.metadata,
-        badge: step.status === 'completed' ? 'Verified' : step.status === 'failed' ? 'Failed' : 'Pending',
-        status: step.status,
-      },
-    }))
+  // Correct group height: last step's bottom + bottom padding
+  const groupH = GROUP_PAD_TOP + (proof.steps.length - 1) * GROUP_STEP_GAP + NODE_H + GROUP_PAD_BOT
 
-    const decisionNode: Node = {
-      id: 'decision',
+  // Vertical positions (all root nodes at x=0, centered via nodeOrigin [0.5, 0])
+  const TRIGGER_Y = 0
+  const GROUP_Y = NODE_H + 48
+  const SIG_Y = GROUP_Y + groupH + 36
+  const USDC_Y = SIG_Y + NODE_H + 24
+
+  const nodes: Node[] = useMemo(() => [
+    {
+      id: 'trigger',
       type: 'proofNode',
-      position: { x: 0, y: 110 * (proof.steps.length + 1) },
+      position: { x: 0, y: TRIGGER_Y },
       data: {
-        label: 'Decision Recorded',
-        meta: `Arc Testnet · Block ${proof.blockNumber.toLocaleString()} · ${proof.txHash.slice(0, 6)}…${proof.txHash.slice(-4)}`,
-        badge: 'Confirmed',
+        label: 'Invoice Submitted',
+        badge: 'Trigger',
         status: 'completed',
       },
-    }
-
-    return [...baseNodes, ...stepNodes, decisionNode]
-  }, [proof])
+    },
+    {
+      id: 'cre-group',
+      type: 'creGroup',
+      position: { x: 0, y: GROUP_Y },
+      data: {},
+      style: { width: GROUP_W, height: groupH },
+    },
+    ...proof.steps.map((step, i) => ({
+      id: `step-${i}`,
+      type: 'proofNode',
+      parentId: 'cre-group',
+      extent: 'parent' as const,
+      // center child within group — nodeOrigin [0.5, 0] applies here too
+      position: { x: GROUP_W / 2, y: GROUP_PAD_TOP + i * GROUP_STEP_GAP },
+      data: {
+        label: step.label,
+        badge: step.status === 'completed'
+            ? (step.badge ?? 'Attested')
+            : step.status === 'failed' ? 'Failed' : 'Pending',
+        status: step.status,
+        // no href — CRE steps don't have individual on-chain records; all 3 share one report
+      },
+    })),
+    {
+      id: 'sig-verified',
+      type: 'proofNode',
+      position: { x: 0, y: SIG_Y },
+      data: {
+        label: 'Execution Proof Verified',
+        badge: 'On-Chain',
+        status: 'on-chain',
+        href: txUrl,
+      },
+    },
+    {
+      id: 'usdc-released',
+      type: 'proofNode',
+      position: { x: 0, y: USDC_Y },
+      data: {
+        label: 'USDC Released from Escrow',
+        badge: 'Released',
+        status: 'released',
+        href: txUrl,
+      },
+    },
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  ], [proof, txUrl, groupH, GROUP_Y, SIG_Y, USDC_Y])
 
   const edges: Edge[] = useMemo(() => {
-    const allIds = ['trigger', ...proof.steps.map((_, i) => `step-${i}`), 'decision']
-    return allIds.slice(0, -1).map((id, i) => ({
-      id: `e${i}`,
-      source: id,
-      target: allIds[i + 1],
-      type: 'smoothstep',
-      style: { stroke: 'hsl(214, 32%, 82%)', strokeWidth: 1.5 },
-    }))
+    const soft = { stroke: 'hsla(180, 85%, 32%, 0.28)', strokeWidth: 1.5 }
+    const dashed = { ...soft, strokeDasharray: '4 3' }
+
+    return [
+      { id: 'e-0', source: 'trigger', target: 'step-0', type: 'smoothstep', style: soft },
+      ...proof.steps.slice(1).map((_, i) => ({
+        id: `e-step-${i}`,
+        source: `step-${i}`,
+        target: `step-${i + 1}`,
+        type: 'smoothstep',
+        style: soft,
+      })),
+      { id: 'e-exit', source: `step-${proof.steps.length - 1}`, target: 'sig-verified', type: 'smoothstep', style: dashed },
+      { id: 'e-z2', source: 'sig-verified', target: 'usdc-released', type: 'smoothstep', style: soft },
+    ]
   }, [proof])
 
   return (
@@ -73,32 +214,34 @@ export function WorkflowCanvas({ proof }: Props) {
         border: '1px solid var(--border-soft)',
         borderRadius: 'var(--radius-lg)',
         overflow: 'hidden',
-        height: 540,
+        height: '100%',
       }}
     >
+      {/* Suppress ReactFlow's selection outline since we handle clicks ourselves */}
+      <style>{`.react-flow__node.selected { box-shadow: none !important; outline: none !important; }`}</style>
       <ReactFlow
         nodes={nodes}
         edges={edges}
         nodeTypes={nodeTypes}
         nodesDraggable={false}
         nodesConnectable={false}
-        elementsSelectable={false}
         deleteKeyCode={null}
         panOnDrag={true}
         zoomOnScroll={true}
         zoomOnPinch={true}
         nodeOrigin={[0.5, 0]}
         fitView
-        fitViewOptions={{ padding: 0.2, maxZoom: 1.2 }}
+        fitViewOptions={{ padding: 0.2, maxZoom: 1.0 }}
         proOptions={{ hideAttribution: true }}
         style={{ background: 'var(--accent-bg)' }}
+        onNodeClick={(_event, node) => {
+          const href = (node.data as { href?: string }).href
+          if (href) window.open(href, '_blank', 'noopener,noreferrer')
+        }}
       >
         <Controls
           showInteractive={false}
-          style={{
-            boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-            border: '1px solid var(--border-soft)',
-          }}
+          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)', border: '1px solid var(--border-soft)' }}
         />
       </ReactFlow>
     </div>
