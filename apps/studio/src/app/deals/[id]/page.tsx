@@ -120,7 +120,7 @@ export default function DealDetailPage() {
           <div style={{ height: 1, background: 'var(--border-soft)' }} />
 
           {/* Tx hash — primary row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, lineHeight: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 13, lineHeight: 1 }}>
             <span style={{ color: 'var(--text-3)' }}>Tx</span>
             {proof.txHash.startsWith('0x') ? (
               <a
@@ -135,8 +135,8 @@ export default function DealDetailPage() {
               <span style={{ fontFamily: 'monospace', color: 'var(--text-2)' }}>{txShort}</span>
             )}
           </div>
-          {/* Complementary metadata — same size, muted color */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 11, lineHeight: 1 }}>
+          {/* Complementary metadata — smaller, muted */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 10, lineHeight: 1 }}>
             {[
               { label: 'Block', value: proof.blockNumber.toLocaleString(), mono: true },
               { label: 'Consensus', value: `${proof.consensus.agreed}/${proof.consensus.total} nodes`, mono: false },
