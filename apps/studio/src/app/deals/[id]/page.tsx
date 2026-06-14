@@ -58,9 +58,6 @@ export default function DealDetailPage() {
               <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-1)', letterSpacing: '-0.02em' }}>
                 {proof.companyName} — Invoice {proof.approved ? 'Approved' : 'Rejected'}
               </span>
-              <span style={{ fontSize: 11, color: 'var(--text-3)', whiteSpace: 'nowrap' as const }}>
-                InvoiceFactoring · {proof.timestamp.slice(0, 10)} · {proof.timestamp.slice(11, 16)} UTC
-              </span>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
