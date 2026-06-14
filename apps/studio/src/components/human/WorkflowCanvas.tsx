@@ -140,7 +140,6 @@ interface Props {
 
 export function WorkflowCanvas({ proof }: Props) {
   const txUrl = `${ARC_EXPLORER}/tx/${proof.txHash}`
-  const txLogsUrl = `${txUrl}?tab=logs`
 
   const txShort = proof.txHash.startsWith('0x')
     ? `${proof.txHash.slice(0, 8)}…${proof.txHash.slice(-4)}`
@@ -189,7 +188,7 @@ export function WorkflowCanvas({ proof }: Props) {
         label: step.label,
         badge: step.status === 'completed' ? 'Attested' : step.status === 'failed' ? 'Failed' : 'Pending',
         status: step.status,
-        href: txLogsUrl,
+        // no href — CRE steps don't have individual on-chain records; all 3 share one report
       },
     })),
     {
@@ -224,7 +223,7 @@ export function WorkflowCanvas({ proof }: Props) {
       },
     },
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  ], [proof, execShort, txLogsUrl, txUrl, txShort, groupH, GROUP_Y, BOUNDARY_Y, SIG_Y, USDC_Y])
+  ], [proof, execShort, txUrl, txShort, groupH, GROUP_Y, BOUNDARY_Y, SIG_Y, USDC_Y])
 
   const edges: Edge[] = useMemo(() => {
     const soft = { stroke: 'hsla(180, 85%, 32%, 0.28)', strokeWidth: 1.5 }
