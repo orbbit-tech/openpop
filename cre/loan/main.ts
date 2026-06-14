@@ -1,5 +1,5 @@
-import { HTTPCapability, EVMClientCapability, handler, Runner, type Runtime, type HTTPPayload } from "@chainlink/cre-sdk"
-import { encodeAbiParameters, parseAbiParameters } from "viem"
+import { HTTPCapability, EVMClient, handler, Runner, prepareReportRequest, type Runtime, type HTTPPayload } from "@chainlink/cre-sdk"
+import { encodeAbiParameters, parseAbiParameters, toHex } from "viem"
 import { type Config, type InvoiceRequest } from "./types"
 import { runCompliance } from "./steps/compliance"
 import { getDairyCommodityPrice } from "./steps/dairy-commodity-price"
@@ -25,18 +25,18 @@ const onInvoiceSubmitted = (runtime: Runtime<Config>, triggerEvent: HTTPPayload)
   const underwriting = runUnderwriting(runtime, { businessName, invoiceId, amount, dairyPriceUsdPerLb: dairyPrice.price })
 
   // Step 4 — Encode verdict and write proof on-chain via the Chainlink forwarder.
-  const evmClient = new EVMClientCapability()
+  const chainSelector = EVMClient.SUPPORTED_CHAIN_SELECTORS[config.chainSelectorName as keyof typeof EVMClient.SUPPORTED_CHAIN_SELECTORS]
+  const evmClient = new EVMClient(chainSelector)
   const encoded = encodeAbiParameters(
     parseAbiParameters("uint256,bool"),
     [BigInt(config.dealId), underwriting.approved]
   )
-  const signedReport = runtime.report(encoded)
+  const signedReport = runtime.report(prepareReportRequest(encoded)).result()
   const txResult = evmClient
     .writeReport(runtime, {
-      toAddress: config.consumerAddress,
-      chainSelectorName: config.chainSelectorName,
+      receiver: config.consumerAddress,
       report: signedReport,
-      gasLimit: 500000n,
+      gasConfig: { gasLimit: "500000" },
     })
     .result()
 
@@ -47,7 +47,7 @@ const onInvoiceSubmitted = (runtime: Runtime<Config>, triggerEvent: HTTPPayload)
     dairyPrice,
     underwriting,
     verdict: underwriting.approved ? "approved" : "rejected",
-    txHash: txResult.txHash,
+    txHash: txResult.txHash ? toHex(txResult.txHash) : null,
     /*
      * runtime.now() is required here — Date.now() is non-deterministic across CRE nodes
      * and would cause consensus to fail.
