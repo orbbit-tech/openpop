@@ -7,9 +7,12 @@ import type { Receipt } from '../../../../src/types/receipt'
 vi.mock('node:child_process')
 vi.mock('node:fs')
 
+const mockFetchWithPayment = vi.hoisted(() =>
+  vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ price: 2.34, unit: 'USD/lb' }) }))
+)
+
 vi.mock('x402-fetch', () => ({
-  wrapFetchWithPayment: (_fetch: unknown, _wallet: unknown) =>
-    (_url: string) => Promise.resolve({ ok: true, json: () => Promise.resolve({ price: 2.34, unit: 'USD/lb' }) }),
+  wrapFetchWithPayment: () => mockFetchWithPayment,
 }))
 
 vi.mock('viem', async (importOriginal) => {
@@ -84,6 +87,7 @@ function makeRequest(): NextRequest {
 describe('POST /api/workflow/run', () => {
   beforeEach(() => {
     vi.resetAllMocks()
+    mockFetchWithPayment.mockResolvedValue({ ok: true, json: () => Promise.resolve({ price: 2.34, unit: 'USD/lb' }) })
     process.env.X402_PRIVATE_KEY = '0x0000000000000000000000000000000000000000000000000000000000000001'
     process.env.DAIRY_API_URL = 'https://g78md4c7ke.execute-api.us-east-1.amazonaws.com/dairy/cream/price'
   })
@@ -155,5 +159,25 @@ describe('POST /api/workflow/run', () => {
 
     expect(res.status).toBe(500)
     expect(vi.mocked(writeFileSync)).not.toHaveBeenCalled()
+  })
+
+  it('[happy-path] x402 fetch returns price → dairyPriceUsdPerLb present in --http-payload passed to spawnSync', async () => {
+    vi.mocked(spawnSync).mockReturnValue({ status: 0, stdout: makeCREStdout(creResult) } as any)
+
+    await POST(makeRequest())
+
+    const args = vi.mocked(spawnSync).mock.calls[0][1] as string[]
+    const idx = args.indexOf('--http-payload')
+    const payload = JSON.parse(args[idx + 1])
+    expect(payload.dairyPriceUsdPerLb).toBe(2.34)
+  })
+
+  it('[unhappy-path] x402 fetch throws → returns 500 and spawnSync is not called', async () => {
+    mockFetchWithPayment.mockRejectedValueOnce(new Error('network error'))
+
+    const res = await POST(makeRequest())
+
+    expect(res.status).toBe(500)
+    expect(vi.mocked(spawnSync)).not.toHaveBeenCalled()
   })
 })
