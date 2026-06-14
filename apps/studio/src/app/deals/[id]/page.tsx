@@ -84,25 +84,6 @@ export default function DealDetailPage() {
               <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text-1)', letterSpacing: '-0.02em' }}>
                 {proof.companyName} — Invoice {proof.approved ? 'Approved' : 'Rejected'}
               </span>
-              {[
-                { label: 'CRE Simulated', bg: 'hsl(38, 90%, 96%)', border: 'hsl(38, 80%, 82%)', color: 'hsl(38, 70%, 38%)' },
-                { label: 'Arc Testnet', bg: 'hsla(180, 85%, 32%, 0.06)', border: 'hsla(180, 85%, 32%, 0.2)', color: 'var(--teal)' },
-              ].map(({ label, bg, border, color }) => (
-                <span key={label} style={{
-                  padding: '2px 7px',
-                  borderRadius: 100,
-                  fontSize: 9,
-                  fontWeight: 600,
-                  letterSpacing: '0.06em',
-                  textTransform: 'uppercase' as const,
-                  background: bg,
-                  border: `1px solid ${border}`,
-                  color,
-                  flexShrink: 0,
-                }}>
-                  {label}
-                </span>
-              ))}
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
