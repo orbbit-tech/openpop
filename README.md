@@ -8,24 +8,34 @@
 
 **Best for:** workflows with private inputs and a counterparty who needs to trust the output.
 
-### Demos
+### Links
 
-Live Studio
+[Contract] ProofGatedEscrow  on Arc testnet
+0x6aDEB480BB7b7c54bE7Fb80b56E7Cd23fBD30527
+
+https://testnet.arcscan.app/address/0x6aDEB480BB7b7c54bE7Fb80b56E7Cd23fBD30527?tab=contract
+
+
+[Demo] Live Studio
 https://openpop.vercel.app/
 
-
-Invoice Financing Verifiable Workflow 
+[Demo] Invoice Financing Verifiable Workflow 
 
 https://youtu.be/lS5N3-kqoGE
 
-Proof MCP
+[Demo] Proof MCP
 
 https://youtu.be/-wDAQe2TOuE
 
-CRE workflow run
+[Demo] CRE workflow run
 
 https://youtu.be/Wh8rcqJCsk8
 
+[X402] Dairy Price API x402
+
+https://g78md4c7ke.execute-api.us-east-1.amazonaws.com/dairy/cream/price
+
+https://github.com/jianruan-io/dairy-cream-price-x402-demo
 
 ## Why
 
