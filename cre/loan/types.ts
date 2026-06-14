@@ -4,6 +4,7 @@ export type Config = {
   complianceApiKeyOwner: string
   underwritingApiKeyOwner: string
   dairyPriceMockUsdPerLb: number
+  dairyPriceApiUrl: string
   defaultBusinessName: string
   consumerAddress: string
   dealId: number

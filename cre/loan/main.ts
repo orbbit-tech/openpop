@@ -19,7 +19,7 @@ const onInvoiceSubmitted = (runtime: Runtime<Config>, triggerEvent: HTTPPayload)
   const compliance = runCompliance(runtime, { businessName, invoiceId })
 
   // Step 2 — Commodity price is used in underwriting to validate invoice realism.
-  const dairyPrice = getDairyCommodityPrice(runtime, req)
+  const dairyPrice = getDairyCommodityPrice(runtime)
 
   // Step 3 — Score the deal using compliance verdict and live commodity price.
   const underwriting = runUnderwriting(runtime, { businessName, invoiceId, amount, dairyPriceUsdPerLb: dairyPrice.price })
