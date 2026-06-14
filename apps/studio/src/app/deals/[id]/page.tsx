@@ -140,7 +140,6 @@ export default function DealDetailPage() {
             {[
               { label: 'Block', value: proof.blockNumber.toLocaleString(), mono: true },
               { label: 'Consensus', value: `${proof.consensus.agreed}/${proof.consensus.total} nodes`, mono: false },
-              { label: 'Prover', value: proof.prover, mono: false },
             ].map(({ label, value, mono }, i, arr) => (
               <span key={label} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 <span style={{ color: 'var(--text-3)' }}>{label}</span>
