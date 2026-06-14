@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
+    "create-wallet": "tsx --env-file=apps/studio/.env.local scripts/create-wallet.ts",
     "start": "tsx --env-file=.env.local scripts/run.ts",
     "setup": "ln -sf ../../.env.local apps/demo-ui/.env.local && echo 'Symlinked .env.local into apps/demo-ui'",
     "test": "vitest run",
