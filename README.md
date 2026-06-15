@@ -1,5 +1,7 @@
 # OpenPop: The OpenClaw for Verifiable AI Workflows.
 
+<img src="./images/openpop-cover-image.png" alt="OpenPop — Proof over Promises" width="720" />
+
 ## What
 
 **One liner:** OpenPop is the OpenClaw of verifiable agent workflows. Proof over Promises.
@@ -8,34 +10,31 @@
 
 **Best for:** workflows with private inputs and a counterparty who needs to trust the output.
 
-### Links
+### Smart Contract
 
-[Contract] ProofGatedEscrow  on Arc testnet
-0x6aDEB480BB7b7c54bE7Fb80b56E7Cd23fBD30527
+[ProofGatedEscrow on Arc testnet — `0x6aDEB480BB7b7c54bE7Fb80b56E7Cd23fBD30527`](https://testnet.arcscan.app/address/0x6aDEB480BB7b7c54bE7Fb80b56E7Cd23fBD30527?tab=contract)
 
-https://testnet.arcscan.app/address/0x6aDEB480BB7b7c54bE7Fb80b56E7Cd23fBD30527?tab=contract
+<img src="./images/openpop-proof-gated-escrow-contract-on-arc.png" alt="ProofGatedEscrow contract on Arc testnet" width="720" />
 
+### Demos
 
-[Demo] Live Studio
-https://openpop.vercel.app/
+[Live Studio →](https://openpop.vercel.app/)
 
-[Demo] Invoice Financing Verifiable Workflow 
+[Invoice Financing Verifiable Workflow ▶](https://youtu.be/lS5N3-kqoGE)
 
-https://youtu.be/lS5N3-kqoGE
+<img src="./images/openpop-invoice-financing-demo-workflow.png" alt="Invoice financing demo — pipeline steps in OpenPop Studio" width="720" />
 
-[Demo] Proof MCP
+[Proof MCP ▶](https://youtu.be/-wDAQe2TOuE)
 
-https://youtu.be/-wDAQe2TOuE
+<img src="./images/openpop-mcp-used-in-claude.png" alt="Claude Code using OpenPop MCP to independently verify the proof" width="720" />
 
-[Demo] CRE workflow run
+<img src="./images/openpop-easy-for-agent-to-verify.png" alt="Raw JSON proof — transparent and machine-readable" width="720" />
 
-https://youtu.be/Wh8rcqJCsk8
+[CRE Workflow Run ▶](https://youtu.be/Wh8rcqJCsk8)
 
-[X402] Dairy Price API x402
+<img src="./images/openpop-cre-workflow-execution.png" alt="Raw JSON proof — transparent and machine-readable" width="720" />
 
-https://g78md4c7ke.execute-api.us-east-1.amazonaws.com/dairy/cream/price
-
-https://github.com/jianruan-io/dairy-cream-price-x402-demo
+[Dairy Cream Price API (x402) →](https://g78md4c7ke.execute-api.us-east-1.amazonaws.com/dairy/cream/price) · [GitHub →](https://github.com/jianruan-io/dairy-cream-price-x402-demo)
 
 ## Why
 
